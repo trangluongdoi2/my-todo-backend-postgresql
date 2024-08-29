@@ -1,0 +1,92 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "REST API for Swagger Documentation",
+    "version": "1.0.0"
+  },
+  "schemes": ["http"],
+  "servers": [{ "url": "http://localhost:9998/" }],
+  "paths": {
+    "/todo-list": {
+      "get": {
+        "tags": ["Todo"],
+        "summary": "Get Todo List",
+        "description": "Get Todo List",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExampleSchemaHeader"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExampleSchemaBody"
+                }
+              }
+            }
+          },
+          "404": { "description": "Not found" },
+          "500": { "description": "Internal server error" }
+        }
+      },
+      "post": {
+        "tags": ["Todo"],
+        "summary": "Create Todo Item",
+        "description": "Create Todo Item",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExampleSchemaHeader"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExampleSchemaBody"
+                }
+              }
+            }
+          },
+          "404": { "description": "Not found" },
+          "500": { "description": "Internal server error" }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ExampleSchemaBody": {
+        "properties": {
+          "responseText": {
+            "type": "string",
+            "example": "This is some example string! This is an endpoint"
+          }
+        }
+      },
+      "ExampleSchemaHeader": {
+        "required": ["text"],
+        "properties": {
+          "text": {
+            "type": "string",
+            "example": "This is some example string!"
+          }
+        }
+      }
+    }
+  }
+}
