@@ -12,7 +12,7 @@ class TodoController {
   }
 
   async getTodoById(req: Request, res: Response) {
-    const data = await TodoService.getTodoItemDetails(req.params.id);
+    const data = await TodoService.getTodoById(req.params.id);
     res.status(data.status).json({
       message: data.message,
       data: data.data
@@ -37,6 +37,21 @@ class TodoController {
   
   async updateTodo(req: Request, res: Response) {
     const data = await TodoService.updateTodo(req.body as any);
+    res.status(data.status).json({
+      message: data.message,
+      data: data.data
+    });
+  }
+
+  async updateTodoByField(req: Request, res: Response) {
+    const { id } = req.params;
+    const { field, value } = req.body;
+    const input = {
+      id,
+      field,
+      value,
+    }
+    const data = await TodoService.updateTodoByField(input);
     res.status(data.status).json({
       message: data.message,
       data: data.data
@@ -70,7 +85,7 @@ class TodoController {
   }
 
   async deleteTodo(req: Request, res: Response) {
-    const data = await TodoService.deleteTodo(req.params.id);
+    const data = await TodoService.deleteTodo(Number(req.params.id));
     res.status(data.status).send(data.message);
   }
 }

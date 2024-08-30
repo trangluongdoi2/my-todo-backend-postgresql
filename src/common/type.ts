@@ -1,6 +1,6 @@
 export enum TodoStatus {
   PENDING = "PENDING",
-  IN_PROGRESS = "IN_PROGRESS",
+  IN_PROGRESS = "IN PROGRESS",
   DONE = "DONE"
 }
 
@@ -10,19 +10,19 @@ export enum Priority {
   HIGH = 'HIGH',
   HIGHEST = 'HIGHEST',
 }
-export interface TodoItemInput {
-  projects: string[],
+
+export interface TodoItem {
   todoName: string,
-  todoStatus?: TodoStatus,
+  title: string,
+  todoStatus: TodoStatus,
+  projects?: string[],
   label: string,
-  tag?: string,
   description: string,
   priority: Priority,
-  title: string,
   assignee?: string[],
 }
 
-export interface TodoItemDetails extends TodoItemInput {
+export interface TodoItemDetails extends TodoItem {
   id: string,
   attachments?: Array<{ id: string, filePath: string }>,
 }

@@ -1,30 +1,63 @@
 import dotenv from 'dotenv';
 import config from '@/config';
-import pool from '@/config/database';
+import bcrypt from 'bcrypt';
+import { Users } from '@/entity/user.entity'
+import { AppDataSource } from '@/config/db-connection';
+import { Repository } from 'typeorm';
 dotenv.config();
 
-
 type TInputCreateUser = {
-  name: string,
+  username: string,
   password: string,
   email: string
 }
 class UserServices {
-  async createUser(input: TInputCreateUser) {
-    const { name, email, password } = input;
-    console.log(input, 'input..');
-    try {
-      const queryStream = 'INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING *';
-      pool.query(queryStream, [name, email, password], (error: any, results: any) => {
-        if (error) {
-          throw new Error();
-        }
-        console.log(results, 'results..');
-      })
-    } catch (error) {
-    }
-    return null;
+  private entity: Repository<Users>;
+  constructor() {
+    this.entity = AppDataSource.getRepository(Users);
   }
+  async createUser(input: TInputCreateUser) {
+    try {
+      const { username, email, password } = input;
+      const newUser = new Users();
+      newUser.username = username;
+      newUser.email = email;
+      const salt = await bcrypt.genSalt(10);
+      const hashPassword = await bcrypt.hash(password.toString(), salt);
+      newUser.password = hashPassword;
+      const { password: hashedPassword, ...res } = await this.entity.save(newUser);
+      return {
+        status: 200,
+        message: 'Created user successfully!',
+        data: res,
+      }
+    } catch (error) {
+      console.log(error, 'error...');
+      return {
+        status: 500,
+        message: 'Created user failed!',
+        data: null,
+      };
+    }
+  }
+
+  async findUserById(userId: string) {
+    return {
+      status: 200,
+      message: 'Hehhe',
+      data: null,
+    }
+  }
+
+  async deleteUser(id: string) {
+    return { 
+      status: 200,
+      message: 'Hehhe',
+      data: null,
+    }
+  }
+
+  // async fe
 }
 
 export default new UserServices();

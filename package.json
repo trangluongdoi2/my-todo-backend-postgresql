@@ -12,6 +12,7 @@
     "@aws-sdk/lib-dynamodb": "^3.598.0",
     "@aws-sdk/lib-storage": "^3.590.0",
     "amazon-cognito-identity-js": "^6.3.12",
+    "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
@@ -24,11 +25,14 @@
     "pg": "^8.12.0",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
+    "typeorm": "^0.3.20",
     "uuid": "^10.0.0",
-    "winston": "^3.13.0"
+    "winston": "^3.13.0",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@eslint/js": "^9.4.0",
+    "@types/bcrypt": "^5.0.2",
     "@types/body-parser": "^1.19.5",
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",

@@ -9,6 +9,7 @@ router.get('/todo', todoController.getTodoList);
 router.get('/todo/:id', todoController.getTodoById)
 router.post('/todo/create', todoController.createTodo);
 router.put('/todo/update/:id', todoController.updateTodo);
+router.put('/todo/update-field/:id', todoController.updateTodoByField);
 router.delete('/todo/delete/:id', todoController.deleteTodo);
 router.post('/todo/upload/:id', uploadMiddleWare.array('images'), todoController.uploadImages);
 router.get('/todo/download/:key', todoController.downloadImage);
