@@ -1,10 +1,21 @@
 import { Priority, TodoStatus } from '@/common/type';
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Project } from '@/entity/project.entity';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+} from 'typeorm';
 
 @Entity()
 export class Todo {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @Column('text', { nullable: true })
+  todoId: string;
 
   @Column()
   todoName: string;
@@ -29,4 +40,13 @@ export class Todo {
 
   @Column('text', { array: true, nullable: true })
   assignee: string[];
+
+  @CreateDateColumn({ type: 'timestamp'})
+  public createAt: Date;
+
+  @UpdateDateColumn({ type: 'timestamp' })
+  public updateAt: Date;
+
+  @ManyToOne(() => Project, (project) => project.projectId)
+  projectId: string;
 }

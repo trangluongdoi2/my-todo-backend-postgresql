@@ -4,6 +4,7 @@ import bodyParser from 'body-parser';
 import authRoute from '@/routes/auth.route';
 import todoRoute from '@/routes/todo.route';
 import userRoute from '@/routes/user.route';
+import projectRoute from '@/routes/project.route';
 import swaggerPlugin from '@/config/swagger';
 import config from './config';
 import { AppDataSource } from '@/config/db-connection';
@@ -31,6 +32,7 @@ function initApp() {
       app.use('/api', authRoute);
       app.use('/api', todoRoute);
       app.use('/api', userRoute);
+      app.use('/api', projectRoute);
       app.get('/', (_, res: Response) => {
         res.send('<h1>My Todo App WTF!!</h1>');
       });

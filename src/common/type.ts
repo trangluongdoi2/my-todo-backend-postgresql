@@ -13,6 +13,7 @@ export enum Priority {
 
 export interface TodoItem {
   todoName: string,
+  todoId: string,
   title: string,
   todoStatus: TodoStatus,
   projects?: string[],

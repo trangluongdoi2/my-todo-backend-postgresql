@@ -1,6 +1,7 @@
+import { Request, Response } from "express";
 import TodoService from "@/services/todo.service";
 import UploadS3Service from '@/services/upload.service';
-import { Request, Response } from "express";
+import { v4 as uuidv4 } from 'uuid'; 
 
 class TodoController {
   async getTodoList(req: Request, res: Response) {
@@ -28,7 +29,11 @@ class TodoController {
   }
 
   async createTodo(req: Request, res: Response) {
-    const data = await TodoService.createTodo(req.body as any);
+    const input = {
+      ...req.body,
+      todoId: uuidv4(),
+    }
+    const data = await TodoService.createTodo(input);
     res.status(data.status).json({
       message: data.message,
       data: data.data

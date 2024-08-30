@@ -1,5 +1,6 @@
 import { TodoItem, TodoItemDetails } from '@/common/type';
 import { AppDataSource } from '@/config/db-connection';
+import { Project } from '@/entity/project.entity';
 import { Todo } from '@/entity/todo.entity';
 import { Repository } from 'typeorm';
 
@@ -53,6 +54,19 @@ class TodoService {
   async createTodo(input: TodoItem) {
     try {
       const res = await this.entity.save(input);
+      const projectManager = AppDataSource.manager.getRepository(Project);
+      console.log(projectManager, 'projectManager..');
+      const projects = await projectManager.find();
+      console.log(projects, 'projects..');
+      // const projects = await projectManager.findOne({
+      //   relations: {
+      //     todoIds: true,
+      //   },
+      //   where: {
+      //     id: 1,
+      //   }
+      // });
+      // console.log(projects, 'projects...');
       return {
         status: 200,
         message: 'Todo created successfully',
@@ -82,7 +96,6 @@ class TodoService {
   async updateTodoByField(input: { id: string , field: string, value: any }) {
     try {
       const { id, field, value } = input;
-      console.log(id, field, value, 'id, field, value..');
       const todoNeedUpdate = await this.entity.findOneBy({ id: id as any });
       let newUpdateTodo;
       if (todoNeedUpdate) {
