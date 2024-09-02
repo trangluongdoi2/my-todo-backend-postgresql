@@ -29,5 +29,5 @@ export class Project {
   public updateAt: Date;
 
   @OneToMany(() => Todo, (todo: any) => todo.project)
-  todos: string[]
+  todos: Todo[]
 }

@@ -10,6 +10,9 @@ const config = {
     port: 5432,
     password: '',
   },
+  jwt: {
+    key: process.env.JWT_SECRET,
+  },
   aws: {
     region: process.env.AWS_REGION || '',
     bucket: process.env.AWS_S3_BUCKET || '',

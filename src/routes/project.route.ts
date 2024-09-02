@@ -1,9 +1,11 @@
 import { Router } from "express";
 import ProjectController from '@/controller/project.controller';
+import AuthMiddleware from "@/middleware/auth.middleware";
 
 const router = Router();
-router.get('/project', ProjectController.getProjectsList);
-router.get('/project/:id', ProjectController.getProjectById);
-router.post('/project/create', ProjectController.createProject);
+router.get('/projects', AuthMiddleware.authentication, AuthMiddleware.authorization, ProjectController.getProjectsList);
+router.get('/projects/:id', AuthMiddleware.authentication, ProjectController.getProjectById);
+// router.post('/projects/create', AuthMiddleware.authentication, ProjectController.createProject);
+router.post('/projects/create', ProjectController.createProject);
 
 export default router;

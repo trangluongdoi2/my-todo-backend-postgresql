@@ -5,7 +5,7 @@ import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
 class ProjectService {
-  private entity: Repository<ProjectItem>;
+  private entity: Repository<Project>;
   constructor() {
     this.entity = AppDataSource.getRepository(Project);
   }

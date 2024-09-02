@@ -1,64 +1,44 @@
-import { Request, Response, NextFunction } from "express";
-import jwkToPem from 'jwk-to-pem';
-import jwt from 'jsonwebtoken';
-
-let pems: { [key: string]: any } = {};
-
+import { Role } from '@/common/user';
+import config from '@/config';
+import { NextFunction, Request, Response } from 'express';
+import * as jwt from "jsonwebtoken";
 class AuthMiddleWare {
-  private poolRegion: string = 'ap-southeast-1';
-  private userPoolId: string = 'ap-southeast-1_h4AcbDbZI';
-  constructor() {
-    this.setUp();
+  authentication(req: Request, res: Response, next: NextFunction) {
+    next();
+    // try {
+    //   const header = req.headers?.authorization;
+    //   if (!header) {
+    //     return res.status(401).json({ message: "Unauthorized" });
+    //   }
+    //   const token = header.split(" ")[1];
+    //   if (!token) {
+    //     return res.status(401).json({ message: "Unauthorized" });
+    //   }
+    //   const decode = jwt.verify(token, config.jwt.key as string);
+    //   if (!decode) {
+    //     return res.status(401).json({ message: "Unauthorized" });
+    //   }
+    //   next();
+    // } catch (error) {
+    //   res.status(400).json({ message: 'Invalid token!' });
+    // }
   }
-
-  verifyToken(req: Request, res: Response, next: NextFunction) {
-    const { token } = req.body;
-    if (!token) {
-      return res.status(401).json({ message: 'Unauthorized' });
-    }
-    let decodedJwt: any = jwt.decode(token, { complete: true });
-    if (decodedJwt === null) {
-      return res.status(401).json({ message: 'Unauthorized' });
-    }
-    let kid = decodedJwt.header.kid;
-    let pem = pems[kid];
-    if (!pem) {
-      res.status(401).json({ message: 'Unauthorized' });
-      return
-    }
-    jwt.verify(token, pem, (err: any, payload: any) => {
-      if (err) {
-        return res.status(401).json({ message: 'Unauthorized' });
-      }
-      next();
-    })
-  }
-
-  private async setUp() {
-    console.log('setUp...');
-    const URL = `https://cognito-idp.${this.poolRegion}.amazonaws.com/${this.userPoolId}/.well-known/jwks.json`;
-    // console.log(URL, 'URL');
+  authorization(req: Request, res: Response, next: NextFunction) {
     try {
-      const response = await fetch(URL);
-      if (response.status !== 200) {
-        throw new Error('Failed to fetch JWKS');
+      const header = req.headers?.role;
+      // console.log(header, 'header');
+      if (!header) {
+        return res.status(401).json({ message: "Unauthorized" });
       }
-      const data = await response.json();
-      const { keys } = data;
-      for (let i = 0; i < keys.length; i++) {
-        const key_id = keys[i].kid;
-        const modulus = keys[i].n;
-        const exponent = keys[i].e;
-        const key_type = keys[i].kty;
-        const jwk = { kty: key_type, n: modulus, e: exponent };
-        const pem = jwkToPem(jwk);
-        pems[key_id] = pem;
+      if ((header as string).toUpperCase() === Role.ADMIN) {
+        next();
+      } else {
+        res.status(400).json({ message: 'Permission denied!' });
       }
     } catch (error) {
-      
+      res.status(400).json({ message: 'Permission denied!' });
     }
   }
 }
 
-export const authMiddleWare = new AuthMiddleWare();
-
+export default new AuthMiddleWare;
