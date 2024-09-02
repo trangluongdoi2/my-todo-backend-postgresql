@@ -12,7 +12,10 @@ class ProjectService {
 
   async createProject(input: ProjectItem) {
     try {
-      const res = await this.entity.save(input);
+      const res = await this.entity.save({
+        ...input,
+        projectId: uuidv4(),
+      });
       return {
         status: 200,
         message: "Create project successfully",
@@ -30,6 +33,31 @@ class ProjectService {
   async getProjectsList() {
     try {
       const res = await this.entity.find();
+      return {
+        status: 200,
+        message: "Todo list fetched successfully",
+        data: res,
+      }
+    } catch (error) {
+      return {
+        status: 500,
+        message: error,
+        data: [],
+      }
+    }
+  }
+  async getProjectById(id: any) {
+    console.log(id, 'id..');
+    try {
+      const res = await this.entity.findOne({
+        where: {
+          projectId: id,
+        },
+        relations: {
+          todos: true,
+        }
+      });
+      console.log(res, 'res...');
       return {
         status: 200,
         message: "Todo list fetched successfully",

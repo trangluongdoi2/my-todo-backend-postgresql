@@ -20,9 +20,6 @@ export class Project {
   projectName: string;
 
   @Column('text', { array: true, default: [] })
-  todoItems: string[];
-
-  @Column('text', { array: true, default: [] })
   members: string[];
 
   @CreateDateColumn({ type: 'timestamp'})
@@ -31,6 +28,6 @@ export class Project {
   @UpdateDateColumn({ type: 'timestamp' })
   public updateAt: Date;
 
-  @OneToMany(() => Todo, (todo) => todo.todoId)
-  todoIds: string[];
+  @OneToMany(() => Todo, (todo: any) => todo.project)
+  todos: string[]
 }

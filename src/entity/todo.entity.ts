@@ -1,12 +1,12 @@
 import { Priority, TodoStatus } from '@/common/type';
 import { Project } from '@/entity/project.entity';
 import {
-  Entity,
   Column,
-  PrimaryGeneratedColumn,
   CreateDateColumn,
-  UpdateDateColumn,
+  Entity,
   ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 
 @Entity()
@@ -47,6 +47,6 @@ export class Todo {
   @UpdateDateColumn({ type: 'timestamp' })
   public updateAt: Date;
 
-  @ManyToOne(() => Project, (project) => project.projectId)
-  projectId: string;
+  @ManyToOne(() => Project, (project: any) => project.todos)
+  project: string;
 }

@@ -1,4 +1,4 @@
-import { TodoItem, TodoItemDetails } from '@/common/type';
+import { TodoItem, TodoItemDetails, TodoStatus, Priority } from '@/common/type';
 import { AppDataSource } from '@/config/db-connection';
 import { Project } from '@/entity/project.entity';
 import { Todo } from '@/entity/todo.entity';
@@ -54,19 +54,6 @@ class TodoService {
   async createTodo(input: TodoItem) {
     try {
       const res = await this.entity.save(input);
-      const projectManager = AppDataSource.manager.getRepository(Project);
-      console.log(projectManager, 'projectManager..');
-      const projects = await projectManager.find();
-      console.log(projects, 'projects..');
-      // const projects = await projectManager.findOne({
-      //   relations: {
-      //     todoIds: true,
-      //   },
-      //   where: {
-      //     id: 1,
-      //   }
-      // });
-      // console.log(projects, 'projects...');
       return {
         status: 200,
         message: 'Todo created successfully',

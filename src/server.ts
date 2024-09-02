@@ -29,7 +29,7 @@ function initApp() {
       app.use(bodyParser.urlencoded({ extended: true }));
       app.use(bodyParser.json());
     
-      app.use('/api', authRoute);
+      // app.use('/api', authRoute);
       app.use('/api', todoRoute);
       app.use('/api', userRoute);
       app.use('/api', projectRoute);
