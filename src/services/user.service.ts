@@ -43,14 +43,15 @@ class UserServices {
       if (!user) {
         return {
           status: 404,
-          message: 'ERROR :: User does not exists!',
+          message: 'User is not exist!',
           data: null
         };
       }
-      if (!bcrypt.compare(password, user.password)) {
+      const flag = await bcrypt.compare(password, user.password);
+      if (!flag) {
         return {
           status: 404,
-          message: 'ERROR :: Password is not match!',
+          message: 'Password is not match!',
           data: null
         }
       }
