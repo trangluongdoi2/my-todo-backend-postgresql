@@ -7,5 +7,5 @@ router.get('/auth', UserController.getAllUsers);
 router.post('/auth/register', UserController.register);
 router.post('/auth/login', UserController.login);
 router.post('/auth/logout', AuthMiddleware.authentication, UserController.logout);
-router.get('/auth/refresh-token/:id', AuthMiddleware.authentication, UserController.getRefreshToken);
+router.post('/auth/refresh-token', UserController.getRefreshToken);
 export default router;

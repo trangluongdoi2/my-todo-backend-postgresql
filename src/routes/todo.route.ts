@@ -5,13 +5,13 @@ import multer from "multer";
 
 const uploadMiddleWare = multer();
 const router = Router();
-router.get('/todo', todoController.getTodoList);
-router.get('/todo/:id', todoController.getTodoById)
-router.post('/todo/create', todoController.createTodo);
-router.put('/todo/update/:id', todoController.updateTodo);
-router.put('/todo/update-field/:id', todoController.updateTodoByField);
-router.delete('/todo/delete/:id', todoController.deleteTodo);
-router.post('/todo/upload/:id', uploadMiddleWare.array('images'), todoController.uploadImages);
-router.get('/todo/download/:key', todoController.downloadImage);
+router.get('/todo', AuthMiddleWare.authentication, todoController.getTodoList);
+router.get('/todo/:id', AuthMiddleWare.authentication, todoController.getTodoById);
+router.post('/todo/create', AuthMiddleWare.authentication, todoController.createTodo);
+router.put('/todo/update/:id', AuthMiddleWare.authentication, todoController.updateTodo);
+router.put('/todo/update-field/:id', AuthMiddleWare.authentication, todoController.updateTodoByField);
+router.delete('/todo/delete/:id', AuthMiddleWare.authentication, todoController.deleteTodo);
+router.post('/todo/upload/:id', AuthMiddleWare.authentication, uploadMiddleWare.array('images'), todoController.uploadImages);
+router.get('/todo/download/:key', AuthMiddleWare.authentication, todoController.downloadImage);
 
 export default router;

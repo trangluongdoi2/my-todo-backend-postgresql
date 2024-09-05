@@ -10,28 +10,21 @@ import config from './config';
 import { AppDataSource } from '@/config/db-connection';
 
 function initApp() {
-  const configsCors = {
-    origin: '*',
-    methods: [
-      'GET',
-      'POST',
-      'PUT',
-      'DELETE',
-    ],
-    allowedHeaders: [
-      'Content-Type',
-    ],
-  }
   try {
     AppDataSource.initialize().then(() => {
       const app = express();
-      app.use(cors(configsCors));
+      app.use(cors({
+        origin: '*',
+        methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+        credentials: true,
+        allowedHeaders: ['*'],
+      }));
       app.use(bodyParser.urlencoded({ extended: true }));
       app.use(bodyParser.json());
     
       // app.use('/api', authRoute);
-      app.use('/api', todoRoute);
       app.use('/api', userRoute);
+      app.use('/api', todoRoute);
       app.use('/api', projectRoute);
       app.get('/', (_, res: Response) => {
         res.send('<h1>My Todo App WTF!!</h1>');

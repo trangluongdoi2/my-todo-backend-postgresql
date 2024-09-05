@@ -46,7 +46,8 @@ export class UserController {
   }
 
   async getRefreshToken(req: Request, res: Response) {
-    const data = await UserService.getRefreshToken(req.params.id as string);
+    const { refreshToken = '' } = req.body;
+    const data = await UserService.getRefreshToken(refreshToken);
     res.json({
       data,
     })

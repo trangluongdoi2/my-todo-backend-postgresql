@@ -115,10 +115,6 @@ class TodoService {
     }
   }
 
-  // async updateProjectsInTodo(input: { id: string, projectId: string | number }) {
-  //   console.log(input, 'updateProjectsInTodo..');
-  // }
-
   async deleteTodo(id: number) {
     try {
       await this.entity.delete({ id: id });

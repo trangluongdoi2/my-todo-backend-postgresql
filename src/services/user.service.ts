@@ -4,6 +4,7 @@ import { AppDataSource } from '@/config/db-connection';
 import { UserCreate, UserLogin } from '@/common/user';
 import { Repository } from 'typeorm';
 import Encrypt from '@/helpers/encrypt';
+import AuthMiddleWare from '@/middleware/auth.middleware';
 
 class UserServices {
   private entity: Repository<Users>;
@@ -21,10 +22,16 @@ class UserServices {
       const hashPassword = await bcrypt.hash(password.toString(), salt);
       newUser.password = hashPassword;
       const { password: hashedPassword, ...res } = await this.entity.save(newUser);
+      const accessToken = Encrypt.generateToken({ id: res.id.toString() });
+      const refreshToken = Encrypt.generateToken({ id: res.id.toString() });
       return {
         status: 200,
         message: 'Created user successfully!',
-        data: res,
+        data: {
+          ...res,
+          accessToken,
+          refreshToken,
+        },
       }
     } catch (error) {
       console.log(error, 'error...');
@@ -47,7 +54,7 @@ class UserServices {
           data: null
         };
       }
-      const flag = await bcrypt.compare(password, user.password);
+      const flag = await bcrypt.compare(password.toString(), user.password);
       if (!flag) {
         return {
           status: 404,
@@ -55,22 +62,22 @@ class UserServices {
           data: null
         }
       }
-      const token = Encrypt.generateToken({ id: user.userId });
-      const refreshToken = Encrypt.generateRefreshToken({ id: user.userId });
+      const accessToken = Encrypt.generateToken({ id: user.id });
+      const refreshToken = Encrypt.generateRefreshToken({ id: user.id });
       return {
         status: 200,
         message: 'Login successfully!',
         data: {
           username: user.username,
           email: user.email,
-          token,
+          accessToken,
           refreshToken
         }
       };
     } catch (error) {
       return {
         status: 500,
-        message: 'ERROR :: Not exist user',
+        message: 'User is not exist!',
         data: null
       }
     }
@@ -80,12 +87,18 @@ class UserServices {
     console.log(input, 'logout..');
   }
 
-  async getRefreshToken(id: string) {
-    const token = Encrypt.generateToken({ id });
-    const refreshToken = Encrypt.generateRefreshToken({ id });
+  async getRefreshToken(token: string) {
+    const id = await AuthMiddleWare.verifyRefreshToken(token);
+    if (!id) {
+      return {
+        status: 401,
+        message: 'Invalid token!',
+      }
+    }
+    const newToken = Encrypt.generateToken({ id });
     return {
-      token,
-      refreshToken,
+      status: 200,
+      accessToken: newToken,
     };
   }
 
