@@ -15,7 +15,7 @@ export type UserCreate = {
   email: string
 }
 
-export enum Role {
+export enum RoleUser {
   ADMIN = 'ADMIN',
   GUEST = 'GUEST',
 }

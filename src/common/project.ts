@@ -1,9 +1,10 @@
+import { User } from "@/common/user";
 import { TodoItem } from "./type";
 
 export interface ProjectItem {
   projectName: string,
   projectId: string,
-  members: string[],
+  members: User[],
   todos?: TodoItem[],
 }
 

@@ -1,5 +1,5 @@
 import * as bcrypt from 'bcrypt';
-import { Users } from '@/entity/user.entity'
+import { User } from '@/entity/user.entity'
 import { AppDataSource } from '@/config/db-connection';
 import { UserCreate, UserLogin } from '@/common/user';
 import { Repository } from 'typeorm';
@@ -7,15 +7,35 @@ import Encrypt from '@/helpers/encrypt';
 import AuthMiddleWare from '@/middleware/auth.middleware';
 
 class UserServices {
-  private entity: Repository<Users>;
+  private entity: Repository<User>;
   constructor() {
-    this.entity = AppDataSource.getRepository(Users);
+    this.entity = AppDataSource.getRepository(User);
+  }
+
+  async getAllUser() {
+    try {
+      const res = await this.entity.createQueryBuilder('User')
+        .select('User.username, User.email, User.role')
+        .execute();
+      console.log(res, 'res...');
+      return {
+        status: 200,
+        message: 'Fetch all User!',
+        data: res,
+      }
+    } catch (error) {
+      return {
+        status: 500,
+        message: 'Fetch all User failed!',
+        data: null,
+      }
+    }
   }
 
   async createUser(input: UserCreate) {
     try {
       const { username, email, password } = input;
-      const newUser = new Users();
+      const newUser = new User();
       newUser.username = username;
       newUser.email = email;
       const salt = await bcrypt.genSalt(10);
@@ -64,12 +84,12 @@ class UserServices {
       }
       const accessToken = Encrypt.generateToken({ id: user.id });
       const refreshToken = Encrypt.generateRefreshToken({ id: user.id });
+      const { password: hashedPassword, ...args } = user;
       return {
         status: 200,
         message: 'Login successfully!',
         data: {
-          username: user.username,
-          email: user.email,
+          ...args,
           accessToken,
           refreshToken
         }
@@ -110,9 +130,9 @@ class UserServices {
     }
   }
 
-  async deleteUser(id: string) {
+  async deleteUser(id: number) {
     try {
-      const user = await this.entity.findOneBy({ userId: id })
+      const user = await this.entity.findOneBy({ id: Number(id) })
       if (user) {
         this.entity.remove(user);
       }

@@ -35,8 +35,8 @@ export class Todo {
   @Column()
   todoStatus: TodoStatus;
 
-  @Column('text', { array: true, nullable: true })
-  projects: string[];
+  // @Column('text', { array: true, nullable: true })
+  // projects: string[];
 
   @Column('text', { array: true, nullable: true })
   assignee: string[];

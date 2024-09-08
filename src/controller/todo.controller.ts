@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import TodoService from "@/services/todo.service";
 import UploadS3Service from '@/services/upload.service';
-import { v4 as uuidv4 } from 'uuid'; 
 
 class TodoController {
   async getTodoList(req: Request, res: Response) {
@@ -20,6 +19,14 @@ class TodoController {
     });
   }
 
+  async getTodosListByProjectId(req: Request, res: Response) {
+    const data = await TodoService.getTodosListByProjectId(Number(req.params.projectId));
+    res.status(data.status).json({
+      message: data.message,
+      data: data.data
+    });
+  }
+
   async queryTodoList(req: Request, res: Response) {
     const data = await TodoService.queryTodoList(req?.query);
     res.status(data.status).json({
@@ -29,11 +36,7 @@ class TodoController {
   }
 
   async createTodo(req: Request, res: Response) {
-    const input = {
-      ...req.body,
-      todoId: uuidv4(),
-    }
-    const data = await TodoService.createTodo(input);
+    const data = await TodoService.createTodo(req.body);
     res.status(data.status).json({
       message: data.message,
       data: data.data

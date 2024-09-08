@@ -4,9 +4,10 @@ import { Request, Response } from 'express';
 
 export class UserController {
   async getAllUsers(req: Request, res: Response) {
-    res.status(200).json({
-      message: 'Noo',
-      data: [],
+    const result = await UserService.getAllUser();
+    res.status(result.status).json({
+      message: result.message,
+      data: result.data,
     });
   }
 

@@ -1,14 +1,14 @@
 import { NextFunction, Request, Response } from 'express';
 import * as JWT from "jsonwebtoken";
 import { Repository } from 'typeorm';
-import { Role } from '@/common/user';
+import { RoleUser } from '@/common/user';
 import config from '@/config';
 import { AppDataSource } from '@/config/db-connection';
-import { Users } from '@/entity/user.entity';
+import { User } from '@/entity/user.entity';
 class AuthMiddleWare {
-  private entity: Repository<Users>
+  private entity: Repository<User>
   constructor() {
-    this.entity = AppDataSource.getRepository(Users);
+    this.entity = AppDataSource.getRepository(User);
   }
   authentication(req: Request, res: Response, next: NextFunction) {
     try {
@@ -39,6 +39,7 @@ class AuthMiddleWare {
         return user.id;
       }
     } catch (error) {
+      console.log(error, 'error...');
       return undefined;
     }
   }
@@ -49,7 +50,7 @@ class AuthMiddleWare {
       if (!header) {
         return res.status(401).json({ message: "Unauthorized" });
       }
-      if ((header as string).toUpperCase() === Role.ADMIN) {
+      if ((header as string).toUpperCase() === RoleUser.ADMIN) {
         next();
       } else {
         res.status(400).json({ message: 'Permission denied!' });

@@ -20,6 +20,15 @@ class ProjectController {
     });
   }
 
+  async getProjectByUserId(req: Request, res: Response) {
+    const { userId = '' } = req.params;
+    const data = await ProjectService.getProjectsListByUserId(Number(userId));
+    res.status(data.status).json({
+      message: data.message,
+      data: data.data
+    });
+  }
+
   async createProject(req: Request, res: Response) {
     const input: ProjectItem = {
       ...req.body,

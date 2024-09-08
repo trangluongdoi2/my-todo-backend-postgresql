@@ -1,8 +1,11 @@
 import { Todo } from '@/entity/todo.entity';
+import { User } from '@/entity/user.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinTable,
+  ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -19,9 +22,6 @@ export class Project {
   @Column()
   projectName: string;
 
-  @Column('text', { array: true, default: [] })
-  members: string[];
-
   @CreateDateColumn({ type: 'timestamp'})
   public createAt: Date;
 
@@ -30,4 +30,8 @@ export class Project {
 
   @OneToMany(() => Todo, (todo: any) => todo.project)
   todos: Todo[]
+
+  @ManyToMany(() => User, (user: any) => user.projects)
+  @JoinTable()
+  members: User[]
 }

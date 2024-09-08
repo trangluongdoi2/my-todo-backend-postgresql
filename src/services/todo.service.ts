@@ -1,17 +1,19 @@
-import { TodoItem, TodoItemDetails, TodoStatus, Priority } from '@/common/type';
+import { Repository } from 'typeorm';
+import { TodoItem, TodoItemDetails } from '@/common/type';
 import { AppDataSource } from '@/config/db-connection';
 import { Project } from '@/entity/project.entity';
 import { Todo } from '@/entity/todo.entity';
-import { Repository } from 'typeorm';
 
 class TodoService {
-  private entity: Repository<Todo>;
+  private repository: Repository<Todo>;
+  private projectRepository: Repository<Project>;
   constructor() {
-    this.entity = AppDataSource.getRepository(Todo);
+    this.repository = AppDataSource.getRepository(Todo);
+    this.projectRepository = AppDataSource.getRepository(Project);
   }
   async getTodoList() {
     try {
-      const res = await this.entity.find();
+      const res = await this.repository.find();
       return {
         status: 200,
         message: "Todo list fetched successfully",
@@ -28,7 +30,7 @@ class TodoService {
 
   async getTodoById(id: string | number) {
     try {
-      const res = await this.entity.findOneBy({ id: id as number });
+      const res = await this.repository.findOneBy({ id: id as number });
       return {
         status: 200,
         message: '',
@@ -51,9 +53,47 @@ class TodoService {
     }
   }
 
+  async getTodosListByProjectId(projectId: number) {
+    const query = `select * from todo left join project on "todo"."projectId" = project.id where "todo"."projectId" = 25;`;
+    try {
+      const res = await this.repository.createQueryBuilder('todo')
+        .leftJoin('todo.project', 'project')
+        .where('project.id = :projectId', { projectId })
+        .addSelect(['project.id', 'project.projectName'])
+        .getMany();
+      console.log(res, 'res...');
+      // const res = await this.repository.query(query);
+      return {
+        status: 200,
+        message: 'getTodosListByProjectId',
+        data: res,
+      }
+    } catch (error) {
+      console.log(error);
+      return {
+        status: 500,
+        message: 'getTodosListByProjectId',
+        data: [],
+      }
+    }
+  }
+
   async createTodo(input: TodoItem) {
     try {
-      const res = await this.entity.save(input);
+      console.log(input, 'input...');
+      const res = await this.repository.save(input);
+      const project = await this.projectRepository.findOne({
+        where: {
+          id: input.projectId,
+        },
+        relations: {
+          todos: true,
+        }
+      });
+      if (project) {
+        project.todos = [...project.todos, res];
+        await this.projectRepository.save(project);
+      }
       return {
         status: 200,
         message: 'Todo created successfully',
@@ -71,8 +111,8 @@ class TodoService {
 
   async updateTodo(input: TodoItemDetails) {
     const { id } = input;
-    const todoNeedUpdate = await this.entity.findOneBy({ id: id as any });
-    await this.entity.save(todoNeedUpdate as any);
+    const todoNeedUpdate = await this.repository.findOneBy({ id: id as any });
+    await this.repository.save(todoNeedUpdate as any);
     return {
       status: 500,
       message: 'Todo update failed',
@@ -83,7 +123,7 @@ class TodoService {
   async updateTodoByField(input: { id: string , field: string, value: any }) {
     try {
       const { id, field, value } = input;
-      const todoNeedUpdate = await this.entity.findOneBy({ id: id as any });
+      const todoNeedUpdate = await this.repository.findOneBy({ id: id as any });
       let newUpdateTodo;
       if (todoNeedUpdate) {
         newUpdateTodo = { 
@@ -91,7 +131,7 @@ class TodoService {
           [field]: value,
         }
       }
-      const res = await this.entity.save(newUpdateTodo as any);
+      const res = await this.repository.save(newUpdateTodo as any);
       return {
         status: 200,
         message: `Update ${field} for todo sucessfully!`,
@@ -117,7 +157,7 @@ class TodoService {
 
   async deleteTodo(id: number) {
     try {
-      await this.entity.delete({ id: id });
+      await this.repository.delete({ id: id });
       return {
         status: 200,
         message: 'Delete todo successfully!',
