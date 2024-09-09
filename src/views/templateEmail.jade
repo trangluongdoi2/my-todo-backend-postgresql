@@ -1,0 +1,21 @@
+block content
+  button(onclick='addMember()') Clickme
+  script 
+    function addMember() {
+      alert('Hello')
+    }
+
+doctype html
+html
+  head
+    title Invite email
+    script(type='text/javascript').
+      function addMember() {
+        console.log('okebaby')
+        alert(JSON.stringify(info))
+      }
+  body
+    h1 Hello email
+    block content
+    //- #container
+    //-   button(onclick='addMember()') Clickme

@@ -1,9 +1,13 @@
+import { Repository } from 'typeorm';
+import { v4 as uuidv4 } from 'uuid';
 import { ProjectItem } from '@/common/project';
 import { AppDataSource } from '@/config/db-connection';
 import { Project } from '@/entity/project.entity';
 import { User } from '@/entity/user.entity';
-import { Repository } from 'typeorm';
-import { v4 as uuidv4 } from 'uuid';
+import MailService from './mail.service';
+import jade from 'jade';
+import fs from 'fs';
+import path from 'path';
 
 class ProjectService {
   private repository: Repository<Project>;
@@ -66,6 +70,7 @@ class ProjectService {
       }
     }
   }
+
   async getProjectById(id: any) {
     try {
       const res = await this.repository.findOne({
@@ -108,7 +113,127 @@ class ProjectService {
         data: [],
       }
     }
+  }
 
+  async getMembersById(id: number) {
+    try {
+      const res = await this.repository.findOne({
+        where: {
+          id,
+        },
+        relations: {
+          members: true,
+        }
+      });
+      const { members = [] } = res as unknown as ProjectItem;
+      return {
+        status: 200,
+        message: 'oke',
+        data: members,
+      }
+    } catch (error) {
+      console.log(error, 'error...');
+      return {
+        status: 500,
+        message: error,
+        data: [],
+      }
+    }
+  }
+
+  async sentInviteMailToAddMember(input: { fromEmail: string, destEmail: string, projectId: number }) {
+    const { fromEmail = '', destEmail = '', projectId } = input;
+    const { data } = await this.getProjectById(projectId) as any;
+    console.log(__dirname, '__dirname');
+    const pathTemplate = path.resolve(__dirname, '../views/templateEmail.jade');
+    const fnTemplate = jade.compile(fs.readFileSync(pathTemplate, { encoding: 'utf-8' }));
+    const info = {
+      projectId,
+      fromEmail,
+      destEmail
+    }
+    const html = fnTemplate(info);
+    const transporter = MailService.transporter;
+    // const createHtml = `
+    //   <div>
+    //     <h1>Invite you to join "<strong>${data?.projectName}</strong>"</h1>
+    //     <button>Accept</button>
+    //   </div>
+    //   <script>
+    //     const projectId = ${projectId};
+    //     const fromEmail = ${fromEmail};
+    //     const destEmail = ${destEmail};
+    //     (() => {
+    //       console.log(projectId, fromEmail, destEmail);
+    //     })()
+    //   </script>
+    // `;
+    const mainOptions = {
+      from: fromEmail,
+      to: destEmail,
+      subject: 'noreply@gmail.com',
+      text: `You recieved message from ${fromEmail}`,
+      html: html,
+    };
+    try {
+      transporter.sendMail(mainOptions, (err, info) => {
+        if (err) {
+          console.log(err);
+          return false;
+        } else {
+          console.log(info, 'info...');
+          return true;
+        }
+      });
+    } catch (error) {
+      console.log(error, 'error...');
+    }
+    return {
+      status: 500,
+      message: '',
+      data: '',
+    }
+  }
+
+  async getMemberByEmail(email: string) {
+    const res = await this.userRepository.findOne({
+      where: {
+        email,
+      },
+      relations: {
+        projects: true,
+      }
+    });
+    return res;
+  }
+
+  async addMember(input: any) {
+    const { email = '', projectId } = input;
+    try {
+      const user = await this.getMemberByEmail(email);
+      const project = await this.repository.findOne({
+        where: {
+          id: projectId,
+        },
+        relations: {
+          members: true,
+        }
+      })
+      if (project && user) {
+        project.members = [...project.members, user];
+        this.repository.save(project);
+      }
+      return {
+        status: 200,
+        message: 'Add member successfully!',
+      }
+    } catch (error) {
+      return {
+        status: 500,
+        message: 'Add member failed!',
+      }
+    }
+    
   }
 }
 

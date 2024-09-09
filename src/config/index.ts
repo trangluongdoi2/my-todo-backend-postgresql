@@ -13,6 +13,10 @@ const config = {
   jwt: {
     key: process.env.JWT_SECRET,
   },
+  email_tranposter: {
+    email: process.env.EMAIL_USERNAME,
+    pass: process.env.EMAIL_PASSWORD,
+  },
   aws: {
     region: process.env.AWS_REGION || '',
     bucket: process.env.AWS_S3_BUCKET || '',
