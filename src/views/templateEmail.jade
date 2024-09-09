@@ -1,21 +1,34 @@
-block content
-  button(onclick='addMember()') Clickme
-  script 
-    function addMember() {
-      alert('Hello')
-    }
+- var logoUrl = 'https://s3-todo-uploads.s3.ap-southeast-1.amazonaws.com/defaults/vueLogo.png';
+- var url = `http://localhost:9998/api/member/add-by-email?projectId='${projectInfos.id}'&email='${destEmail}'`;
 
 doctype html
 html
   head
-    title Invite email
-    script(type='text/javascript').
-      function addMember() {
-        console.log('okebaby')
-        alert(JSON.stringify(info))
-      }
-  body
-    h1 Hello email
-    block content
-    //- #container
-    //-   button(onclick='addMember()') Clickme
+    meta(charset="UTF-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    title Email Template
+  body(style="margin: 0; padding: 0; font-family: Arial,s sans-serif;")
+    table(width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse;")
+      tr
+        td(style="padding: 0;")
+          table(width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; margin: 0 auto; border: 1px solid #c4c4c4;")
+            tr
+              td(height="500" valign="middle" align="center" style="padding: 20px;")
+                table(cellpadding="0" cellspacing="0" style="width: 100%;")
+                  tr
+                    td(align="center")
+                      img(src=logoUrl style="width: 100px; height: 100px;")
+                  tr
+                    td(align="center" style="padding-top: 20px;")
+                      h2 
+                        | Hello
+                        span &nbsp;
+                        span(style="color: #42B883; font-weight: bold;") #{memberInfos.name}
+                        span &nbsp;
+                        | we invite you to join the
+                        span &nbsp;
+                        span(style="color: #42B883; font-weight: bold;") #{projectInfos.name}
+                      p To join with us, please click the button below to active.
+                  tr
+                    td(align="center" style="padding-top: 20px;")
+                      a(href=url target='_blank' style="display: inline-block; padding: 10px 20px; background-color: #42B883; border-radius: 4px; color: white; font-weight: bold; text-decoration: none;") ACCEPT

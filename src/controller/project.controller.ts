@@ -4,6 +4,7 @@ import { ProjectItem } from '@/common/project';
 import ProjectService from '@/services/project.service';
 class ProjectController {
   async getProjectsList(req: Request, res: Response) {
+    console.log('getProjectsList...');
     const data = await ProjectService.getProjectsList();
     res.status(data.status).json({
       message: data.message,

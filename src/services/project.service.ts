@@ -144,44 +144,36 @@ class ProjectService {
   async sentInviteMailToAddMember(input: { fromEmail: string, destEmail: string, projectId: number }) {
     const { fromEmail = '', destEmail = '', projectId } = input;
     const { data } = await this.getProjectById(projectId) as any;
-    console.log(__dirname, '__dirname');
+    const user = await this.getMemberByEmail(destEmail);
     const pathTemplate = path.resolve(__dirname, '../views/templateEmail.jade');
     const fnTemplate = jade.compile(fs.readFileSync(pathTemplate, { encoding: 'utf-8' }));
     const info = {
-      projectId,
       fromEmail,
-      destEmail
+      destEmail,
+      projectInfos: {
+        id: projectId,
+        name: data.projectName,
+      },
+      memberInfos: {
+        name: user?.username,
+      }
     }
     const html = fnTemplate(info);
     const transporter = MailService.transporter;
-    // const createHtml = `
-    //   <div>
-    //     <h1>Invite you to join "<strong>${data?.projectName}</strong>"</h1>
-    //     <button>Accept</button>
-    //   </div>
-    //   <script>
-    //     const projectId = ${projectId};
-    //     const fromEmail = ${fromEmail};
-    //     const destEmail = ${destEmail};
-    //     (() => {
-    //       console.log(projectId, fromEmail, destEmail);
-    //     })()
-    //   </script>
-    // `;
     const mainOptions = {
       from: fromEmail,
       to: destEmail,
       subject: 'noreply@gmail.com',
       text: `You recieved message from ${fromEmail}`,
-      html: html,
+      html,
     };
     try {
-      transporter.sendMail(mainOptions, (err, info) => {
+      transporter.sendMail(mainOptions, (err: any, info: any) => {
         if (err) {
           console.log(err);
           return false;
         } else {
-          console.log(info, 'info...');
+          // console.log(info, 'info...');
           return true;
         }
       });

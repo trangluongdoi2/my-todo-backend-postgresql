@@ -1,13 +1,15 @@
-import express, { Response} from 'express';
+import express, { response, Response} from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
-import authRoute from '@/routes/auth.route';
 import todoRoute from '@/routes/todo.route';
 import userRoute from '@/routes/user.route';
+import addMemberRoute from '@/routes/confirmAddMember.route';
+// import addMemberRoute from '@/routes/confirmAddMember.route';
 import projectRoute from '@/routes/project.route';
 import swaggerPlugin from '@/config/swagger';
 import config from './config';
 import { AppDataSource } from '@/config/db-connection';
+import path from 'path';
 
 function initApp() {
   try {
@@ -21,11 +23,14 @@ function initApp() {
       }));
       app.use(bodyParser.urlencoded({ extended: true }));
       app.use(bodyParser.json());
+
+      app.set('views', path.join(__dirname, 'views'));
+      app.set('view engine', 'jade');
     
-      // app.use('/api', authRoute);
       app.use('/api', userRoute);
       app.use('/api', todoRoute);
       app.use('/api', projectRoute);
+      app.use('/api', addMemberRoute);
       app.get('/', (_, res: Response) => {
         res.send('<h1>My Todo App WTF!!</h1>');
       });
