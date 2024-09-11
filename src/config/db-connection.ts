@@ -1,12 +1,20 @@
 import { DataSource } from "typeorm";
+import { Project } from "@/entity/project.entity";
+import { Todo } from "@/entity/todo.entity";
+import { User } from "@/entity/user.entity";
 
 export const AppDataSource = new DataSource({
   type: 'postgres',
   host: 'localhost',
   port: 5432,
   username: 'me',
-  password: '1',
+  password: '',
   database: 'todo',
   synchronize: true,
-  entities: ["src/entity/*.ts"],
+  logging: true,
+  entities: [
+    Project,
+    Todo,
+    User,
+  ],
 })

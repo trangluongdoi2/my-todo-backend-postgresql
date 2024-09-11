@@ -95,7 +95,7 @@ class UserServices {
     } catch (error) {
       return {
         status: 500,
-        message: 'User is not exist!',
+        message: 'Error!',
         data: null
       }
     }
