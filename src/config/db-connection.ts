@@ -5,7 +5,7 @@ export const AppDataSource = new DataSource({
   host: 'localhost',
   port: 5432,
   username: 'me',
-  password: '',
+  password: '1',
   database: 'todo',
   synchronize: true,
   entities: ["src/entity/*.ts"],
