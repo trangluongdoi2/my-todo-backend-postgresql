@@ -4,7 +4,7 @@
   },
   "compilerOptions": {
     "esModuleInterop": true,
-    "target": "es2020",
+    "target": "ES5",
     "noImplicitAny": true,
     "moduleResolution": "node",
     "sourceMap": false,
