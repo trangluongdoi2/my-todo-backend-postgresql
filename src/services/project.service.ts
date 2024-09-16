@@ -1,20 +1,23 @@
+import jade from 'jade';
+import fs from 'fs';
+import path from 'path';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { ProjectItem } from '@/common/project';
 import { AppDataSource } from '@/config/db-connection';
 import { Project } from '@/entity/project.entity';
+import { Todo } from '@/entity/todo.entity';
 import { User } from '@/entity/user.entity';
 import MailService from './mail.service';
-import jade from 'jade';
-import fs from 'fs';
-import path from 'path';
 
 class ProjectService {
   private repository: Repository<Project>;
   private userRepository: Repository<User>;
+  private todoRepository: Repository<Todo>;
   constructor() {
     this.repository = AppDataSource.getRepository(Project);
     this.userRepository = AppDataSource.getRepository(User);
+    this.todoRepository = AppDataSource.getRepository(Todo);
   }
 
   async createProject(input: ProjectItem) {
@@ -71,7 +74,7 @@ class ProjectService {
     }
   }
 
-  async getProjectById(id: any) {
+  async getProjectById(id: number) {
     try {
       const res = await this.repository.findOne({
         where: {
@@ -88,6 +91,35 @@ class ProjectService {
         status: 500,
         message: error,
         data: [],
+      }
+    }
+  }
+
+  async deleteProjectById(id: number) {
+    try {
+      const project = await this.repository.findOne({
+        where: {
+          id,
+        },
+        relations: {
+          todos: true,
+        }
+      })
+      if (project) {
+        console.log(project, 'project...');
+        const { todos = [] } = project;
+        todos.forEach((todo: Todo) => {
+          this.userRepository.delete(todo.id);
+        })
+      }
+      return {
+        status: 200,
+        message: 'Delete project successfully!',
+      }
+    } catch (error) {
+      return {
+        status: 500,
+        message: 'Delete project failed!',
       }
     }
   }

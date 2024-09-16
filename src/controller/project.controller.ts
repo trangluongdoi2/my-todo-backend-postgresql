@@ -14,7 +14,7 @@ class ProjectController {
 
   async getProjectById(req: Request, res: Response) {
     const { id = '' } = req.params;
-    const data = await ProjectService.getProjectById(id);
+    const data = await ProjectService.getProjectById(Number(id));
     res.status(data.status).json({
       message: data.message,
       data: data.data
@@ -29,12 +29,16 @@ class ProjectController {
       data: data.data
     });
   }
+
+  async deleteProject(req: Request, res: Response) {
+    const { id = '' } = req.params;
+    const data = await ProjectService.deleteProjectById(Number(id));
+    res.status(data?.status).send(data?.message);
+  }
   
   async getMembersById(req: Request, res: Response) {
     const { projectId = '' } = req.params;
-    // console.log(projectId, 'getMembersById...');
     const data = await ProjectService.getMembersById(Number(projectId));
-    console.log(data, 'data...');
     res.status(data.status).json({
       message: data.message,
       data: data.data
