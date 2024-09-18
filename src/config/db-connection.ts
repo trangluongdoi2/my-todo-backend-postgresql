@@ -11,7 +11,6 @@ export const AppDataSource = new DataSource({
   password: '',
   database: 'todo',
   synchronize: true,
-  logging: true,
   entities: [
     Project,
     Todo,
