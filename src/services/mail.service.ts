@@ -29,10 +29,8 @@ class MailService {
     try {
       this.transporter.sendMail(mainOptions, (err, info) => {
         if (err) {
-          console.log(err);
           return false;
         } else {
-          console.log('Message sent: ' +  info.response);
           return true;
         }
       });

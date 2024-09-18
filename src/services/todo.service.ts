@@ -61,15 +61,12 @@ class TodoService {
         .where('project.id = :projectId', { projectId })
         .addSelect(['project.id', 'project.projectName'])
         .getMany();
-      console.log(res, 'res...');
-      // const res = await this.repository.query(query);
       return {
         status: 200,
         message: 'getTodosListByProjectId',
         data: res,
       }
     } catch (error) {
-      console.log(error);
       return {
         status: 500,
         message: 'getTodosListByProjectId',
@@ -80,7 +77,6 @@ class TodoService {
 
   async createTodo(input: TodoItem) {
     try {
-      console.log(input, 'input...');
       const res = await this.repository.save(input);
       const project = await this.projectRepository.findOne({
         where: {
@@ -138,7 +134,6 @@ class TodoService {
         data: res,
       }
     } catch (error) {
-      console.log(error);
       return {
         status: 500,
         message: 'Todo update failed',

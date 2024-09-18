@@ -17,7 +17,6 @@ class UserServices {
       const res = await this.entity.createQueryBuilder('User')
         .select('User.username, User.email, User.role')
         .execute();
-      console.log(res, 'res...');
       return {
         status: 200,
         message: 'Fetch all User!',
@@ -54,7 +53,6 @@ class UserServices {
         },
       }
     } catch (error) {
-      console.log(error, 'error...');
       return {
         status: 500,
         message: 'Created user failed!',
@@ -104,7 +102,6 @@ class UserServices {
   }
 
   async logout(input: any) {
-    console.log(input, 'logout..');
   }
 
   async getRefreshToken(token: string) {

@@ -35,7 +35,6 @@ class AuthController {
   }
 
   updateUser(req: Request, res: Response) {
-    console.log(req.body as any);
     res.send('updateUser...')
   }
   

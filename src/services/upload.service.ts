@@ -24,7 +24,6 @@ class UploadS3Service {
       const res = await this.client.send(command);
       // Need research why the base64 is allow create blob and 'uint-8' is not
       const data =  await res.Body?.transformToString('base64');
-      console.log(data);
       return data;
     } catch (err) {
       console.error(err);

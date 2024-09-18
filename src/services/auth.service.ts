@@ -51,7 +51,6 @@ class AuthServices {
       const command = new InitiateAuthCommand(params as any);
       const { AuthenticationResult } = await this.cognitoClient.send(command);
       if (AuthenticationResult) {
-        console.log(AuthenticationResult, 'AuthenticationResult..');
         const data = {
           idToken: AuthenticationResult.IdToken,
           accessToken: AuthenticationResult.AccessToken,
@@ -167,7 +166,6 @@ class AuthServices {
   }
 
   async deleteUser(username: string) {
-    console.log(username, 'deleteUser');
     // const command = new AdminDeleteUserCommand({
     //   UserPoolId: process.env.COGNITO_USER_POOL_ID as string,
     //   Username: username,

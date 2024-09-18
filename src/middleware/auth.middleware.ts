@@ -33,13 +33,11 @@ class AuthMiddleWare {
   async verifyRefreshToken(refreshToken: string) {
     try {
       const res = JWT.verify(refreshToken, config.jwt.key as string) as JWT.JwtPayload;
-      console.log(res, 'verifyRefreshToken...');
       const user = await this.entity.findOneBy({ id: res?.id });
       if (user) {
         return user.id;
       }
     } catch (error) {
-      console.log(error, 'error...');
       return undefined;
     }
   }

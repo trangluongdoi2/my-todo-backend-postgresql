@@ -106,7 +106,6 @@ class ProjectService {
         }
       })
       if (project) {
-        console.log(project, 'project...');
         const { todos = [] } = project;
         todos.forEach((todo: Todo) => {
           this.userRepository.delete(todo.id);
@@ -138,7 +137,6 @@ class ProjectService {
         data: res,
       }
     } catch (error) {
-      console.log(error, 'error...');
       return {
         status: 500,
         message: error,
@@ -164,7 +162,6 @@ class ProjectService {
         data: members,
       }
     } catch (error) {
-      console.log(error, 'error...');
       return {
         status: 500,
         message: error,
@@ -202,10 +199,8 @@ class ProjectService {
     try {
       transporter.sendMail(mainOptions, (err: any, info: any) => {
         if (err) {
-          console.log(err);
           return false;
         } else {
-          // console.log(info, 'info...');
           return true;
         }
       });
