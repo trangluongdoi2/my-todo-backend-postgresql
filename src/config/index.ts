@@ -5,11 +5,11 @@ dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 const config = {
   app_port: process.env.PORT || 9998,
   postgresql: {
-    user: 'me',
-    host: 'localhost',
-    database: 'todo',
-    port: 5432,
-    password: '',
+    user: process.env.POSTGRES_USER,
+    host: process.env.POSTGRES_HOST,
+    database: process.env.POSTGRES_DATABASE,
+    port: Number(process.env.POSTGRES_PORT),
+    password: process.env.POSTGRES_PASSWORD,
   },
   jwt: {
     key: process.env.JWT_SECRET,
