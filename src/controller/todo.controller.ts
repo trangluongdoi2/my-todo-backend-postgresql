@@ -3,8 +3,8 @@ import TodoService from "@/services/todo.service";
 import UploadS3Service from '@/services/upload.service';
 
 class TodoController {
-  async getTodoList(req: Request, res: Response) {
-    const data = await TodoService.getTodoList();
+  async getTodos(req: Request, res: Response) {
+    const data = await TodoService.getTodos();
     res.status(data.status).json({
       message: data.message,
       data: data.data
@@ -12,7 +12,7 @@ class TodoController {
   }
 
   async getTodoById(req: Request, res: Response) {
-    const data = await TodoService.getTodoById(req.params.id);
+    const data = await TodoService.getTodoById(Number(req.params.id));
     res.status(data.status).json({
       message: data.message,
       data: data.data
@@ -21,14 +21,6 @@ class TodoController {
 
   async getTodosListByProjectId(req: Request, res: Response) {
     const data = await TodoService.getTodosListByProjectId(Number(req.params.projectId));
-    res.status(data.status).json({
-      message: data.message,
-      data: data.data
-    });
-  }
-
-  async queryTodoList(req: Request, res: Response) {
-    const data = await TodoService.queryTodoList(req?.query);
     res.status(data.status).json({
       message: data.message,
       data: data.data
@@ -70,7 +62,8 @@ class TodoController {
     const id = req.body.id || '';
     const uploadedFiles = await UploadS3Service.handle((req?.files as any) || []);
     if (!uploadedFiles.length) {
-      res.sendStatus(500).send('Uploaded Failed!');
+      res.status(500).send('Uploaded Failed!');
+      return;
     }
     const data = await TodoService.updateAttachments({ id, files: uploadedFiles });
     res.status(data.status).json({

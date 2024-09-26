@@ -2,6 +2,7 @@ import { DataSource } from "typeorm";
 import { Project } from "@/entity/project.entity";
 import { Todo } from "@/entity/todo.entity";
 import { User } from "@/entity/user.entity";
+import { Attachment } from "@/entity/attachment.entity";
 import config from "./index";
 
 export const AppDataSource = new DataSource({
@@ -16,5 +17,6 @@ export const AppDataSource = new DataSource({
     Project,
     Todo,
     User,
+    Attachment,
   ],
 })

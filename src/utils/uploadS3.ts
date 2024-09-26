@@ -40,6 +40,7 @@ async function uploadS3(files: any, bucketName: string) {
     const command = new PutObjectCommand(params);
     return client.send(command);
   })).then((data) => {
+    console.log(data, 'data...');
     data.forEach((res: any, index: number) => {
       if (res.status === 'fulfilled') {
       } else {

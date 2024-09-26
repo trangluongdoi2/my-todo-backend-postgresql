@@ -1,13 +1,15 @@
-import { Priority, TodoStatus } from '@/common/type';
-import { Project } from '@/entity/project.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Priority, TodoStatus } from '@/common/type';
+import { Attachment } from '@/entity/attachment.entity';
+import { Project } from '@/entity/project.entity';
 
 @Entity()
 export class Todo {
@@ -35,9 +37,6 @@ export class Todo {
   @Column()
   todoStatus: TodoStatus;
 
-  // @Column('text', { array: true, nullable: true })
-  // projects: string[];
-
   @Column('text', { array: true, nullable: true })
   assignee: string[];
 
@@ -49,4 +48,7 @@ export class Todo {
 
   @ManyToOne(() => Project, (project: any) => project.todos)
   project: string;
+
+  @OneToMany(() => Attachment, (attachment: any) => attachment.todo)
+  attachments: any;
 }

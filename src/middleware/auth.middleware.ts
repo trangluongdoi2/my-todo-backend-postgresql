@@ -1,10 +1,12 @@
 import { NextFunction, Request, Response } from 'express';
 import * as JWT from "jsonwebtoken";
 import { Repository } from 'typeorm';
+import httpStatus from 'http-status';
 import { RoleUser } from '@/common/user';
 import config from '@/config';
 import { AppDataSource } from '@/config/db-connection';
 import { User } from '@/entity/user.entity';
+import ApiError from '@/utils/apiError';
 class AuthMiddleWare {
   private entity: Repository<User>
   constructor() {
@@ -14,19 +16,23 @@ class AuthMiddleWare {
     try {
       const header = req.headers?.authorization;
       if (!header) {
-        return res.status(401).json({ message: "Unauthorized" });
+        // return res.status(401).json({ message: "Unauthorized" });
+        throw new ApiError(httpStatus.UNAUTHORIZED, 'Unauthorized')
       }
       const token = header.split(" ")[1];
       if (!token) {
-        return res.status(401).json({ message: "Unauthorized" });
+        // return res.status(401).json({ message: "Unauthorized" });
+        throw new ApiError(httpStatus.UNAUTHORIZED, 'Unauthorized')
       }
       const decode = JWT.verify(token, config.jwt.key as string);
       if (!decode) {
-        return res.status(401).json({ message: "Unauthorized" });
+        // return res.status(401).json({ message: "Unauthorized" });
+        throw new ApiError(httpStatus.UNAUTHORIZED, 'Unauthorized')
       }
       next();
     } catch (error) {
-      res.status(401).json({ message: 'Invalid token!' });
+      // res.status(401).json({ message: 'Invalid token!' });
+      throw new ApiError(httpStatus.UNAUTHORIZED, 'Invalid Token')
     }
   }
 

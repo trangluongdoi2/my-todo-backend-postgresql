@@ -5,6 +5,8 @@ import { UserCreate, UserLogin } from '@/common/user';
 import { Repository } from 'typeorm';
 import Encrypt from '@/helpers/encrypt';
 import AuthMiddleWare from '@/middleware/auth.middleware';
+import ApiError from '@/utils/apiError';
+import httpStatus from 'http-status';
 
 class UserServices {
   private entity: Repository<User>;
@@ -63,41 +65,21 @@ class UserServices {
 
   async login(input: UserLogin) {
     const { username, password } = input;
-    try {
-      const user = await this.entity.findOneBy({ username });
-      if (!user) {
-        return {
-          status: 404,
-          message: 'User is not exist!',
-          data: null
-        };
-      }
-      const flag = await bcrypt.compare(password.toString(), user.password);
-      if (!flag) {
-        return {
-          status: 404,
-          message: 'Password is not match!',
-          data: null
-        }
-      }
-      const accessToken = Encrypt.generateToken({ id: user.id });
-      const refreshToken = Encrypt.generateRefreshToken({ id: user.id });
-      const { password: hashedPassword, ...args } = user;
-      return {
-        status: 200,
-        message: 'Login successfully!',
-        data: {
-          ...args,
-          accessToken,
-          refreshToken
-        }
-      };
-    } catch (error) {
-      return {
-        status: 500,
-        message: 'Error!',
-        data: null
-      }
+    const user = await this.entity.findOneBy({ username });
+    if (!user) {
+      throw new ApiError(httpStatus.BAD_REQUEST, 'User is not exist!');
+    }
+    const flag = await bcrypt.compare(password.toString(), user.password);
+    if (!flag) {
+      throw new ApiError(httpStatus.BAD_REQUEST, 'Password is not match!');
+    }
+    const accessToken = Encrypt.generateToken({ id: user.id });
+    const refreshToken = Encrypt.generateRefreshToken({ id: user.id });
+    const { password: hashedPassword, ...args } = user;
+    return {
+      ...args,
+      accessToken,
+      refreshToken
     }
   }
 

@@ -1,5 +1,6 @@
 import { UserLogin } from '@/common/user';
 import UserService from '@/services/user.service';
+import { catchAsync } from '@/utils/catchAsync';
 import { Request, Response } from 'express';
 
 export class UserController {
@@ -25,13 +26,10 @@ export class UserController {
     });
   }
 
-  async login(req: Request, res: Response) {
-    const result = await UserService.login(req.body as UserLogin);
-    res.status(result.status).json({
-      message: result.message,
-      data: result.data,
-    });
-  }
+  login = catchAsync(async (req: Request, res: Response) => {
+    const user = await UserService.login(req.body as UserLogin);
+    res.send(user);
+  });
 
   async logout(req: Request, res: Response) {
     console.log('logout...');

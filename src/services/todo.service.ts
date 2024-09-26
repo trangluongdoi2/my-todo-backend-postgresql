@@ -1,17 +1,21 @@
+import { v4 as uuidv4 } from 'uuid';
 import { Repository } from 'typeorm';
 import { TodoItem, TodoItemDetails } from '@/common/type';
 import { AppDataSource } from '@/config/db-connection';
 import { Project } from '@/entity/project.entity';
 import { Todo } from '@/entity/todo.entity';
+import { Attachment } from '@/entity/attachment.entity';
 
 class TodoService {
   private repository: Repository<Todo>;
   private projectRepository: Repository<Project>;
+  private attachmentRepository: Repository<Attachment>;
   constructor() {
     this.repository = AppDataSource.getRepository(Todo);
     this.projectRepository = AppDataSource.getRepository(Project);
+    this.attachmentRepository = AppDataSource.getRepository(Attachment);
   }
-  async getTodoList() {
+  async getTodos() {
     try {
       const res = await this.repository.find();
       return {
@@ -28,9 +32,12 @@ class TodoService {
     }
   }
 
-  async getTodoById(id: string | number) {
+  async getTodoById(id: number) {
     try {
-      const res = await this.repository.findOneBy({ id: id as number });
+      const res = await this.repository.findOne({
+        where: { id },
+        relations: { attachments: true },
+      });
       return {
         status: 200,
         message: '',
@@ -45,16 +52,7 @@ class TodoService {
     }
   }
 
-  async queryTodoList(query?: Record<string, any>) {
-    return {
-      status: 200,
-      message: 'queryTodoList',
-      data: [],
-    }
-  }
-
   async getTodosListByProjectId(projectId: number) {
-    const query = `select * from todo left join project on "todo"."projectId" = project.id where "todo"."projectId" = 25;`;
     try {
       const res = await this.repository.createQueryBuilder('todo')
         .leftJoin('todo.project', 'project')
@@ -142,11 +140,26 @@ class TodoService {
     }
   }
 
-  async updateAttachments(input: { id: string, files: any[] }) {
+  async updateAttachments(input: { id: number, files: any[] }) {
+    const todoItem = await this.repository.findOne({
+      where: { id: input.id },
+      relations: { attachments: true }
+    });
+    if (!todoItem) {
+      return {
+        status: 500,
+        message: 'Todo update failed',
+        data: null,
+      }
+    }
+    const objectNewUrls = input.files.map((file: any) => ({ id: uuidv4(), ...file }))
+    const newAttachments = await this.attachmentRepository.save(objectNewUrls);
+    todoItem.attachments = [...todoItem?.attachments || [], ...newAttachments];
+    const res = await this.repository.save(todoItem);
     return {
-      status: 500,
-      message: 'Todo update failed',
-      data: null,
+      status: 200,
+      message: 'Todo update successfully!',
+      data: res,
     }
   }
 

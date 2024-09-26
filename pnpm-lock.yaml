@@ -30,6 +30,7 @@ specifiers:
   eslint: ^8.57.0
   express: ^4.19.2
   globals: ^15.4.0
+  http-status: ^1.7.4
   jade: ^1.11.0
   jsonwebtoken: ^9.0.2
   jwk-to-pem: ^2.0.5
@@ -60,6 +61,7 @@ dependencies:
   cors: 2.8.5
   dotenv: 16.4.5
   express: 4.19.2
+  http-status: 1.7.4
   jade: 1.11.0
   jsonwebtoken: 9.0.2
   jwk-to-pem: 2.0.6
@@ -3048,6 +3050,11 @@ packages:
       setprototypeof: 1.2.0
       statuses: 2.0.1
       toidentifier: 1.0.1
+    dev: false
+
+  /http-status/1.7.4:
+    resolution: {integrity: sha512-c2qSwNtTlHVYAhMj9JpGdyo0No/+DiKXCJ9pHtZ2Yf3QmPnBIytKSRT7BuyIiQ7icXLynavGmxUqkOjSrAuMuA==}
+    engines: {node: '>= 0.4.0'}
     dev: false
 
   /https-proxy-agent/5.0.1:

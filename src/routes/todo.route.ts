@@ -5,7 +5,7 @@ import multer from "multer";
 
 const uploadMiddleWare = multer();
 const router = Router();
-router.get('/todo', AuthMiddleWare.authentication, todoController.getTodoList);
+router.get('/todo', AuthMiddleWare.authentication, todoController.getTodos);
 router.get('/todo/:id', AuthMiddleWare.authentication, todoController.getTodoById);
 router.get('/todo-list/:projectId', AuthMiddleWare.authentication, todoController.getTodosListByProjectId);
 router.post('/todo/create', AuthMiddleWare.authentication, todoController.createTodo);

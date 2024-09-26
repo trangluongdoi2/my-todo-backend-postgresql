@@ -2,27 +2,52 @@ import { Request, Response } from 'express';
 import { v4 as uuidv4 } from 'uuid'; 
 import { ProjectItem } from '@/common/project';
 import ProjectService from '@/services/project.service';
+import { catchAsync } from '@/utils/catchAsync';
+import httpStatus from 'http-status';
+import { pick } from '@/utils/pick';
 class ProjectController {
-  async getProjectsList(req: Request, res: Response) {
-    const data = await ProjectService.getProjectsList();
-    res.status(data.status).json({
-      message: data.message,
-      data: data.data
-    });
-  }
+  // async getProjects(req: Request, res: Response) {
+  //   const data = await ProjectService.getProjects();
+  //   res.status(data.status).json({
+  //     message: data.message,
+  //     data: data.data
+  //   });
+  // }
 
-  async getProjectById(req: Request, res: Response) {
-    const { id = '' } = req.params;
-    const data = await ProjectService.getProjectById(Number(id));
-    res.status(data.status).json({
-      message: data.message,
-      data: data.data
-    });
-  }
+  getProjects = catchAsync(async (req: Request, res: Response) => {
+    const projects = await ProjectService.getProjects();
+    res.status(httpStatus.OK).send(projects);
+  });
+
+  getProjectById = catchAsync(async (req: Request, res: Response) => {
+    // const { id = '' } = req.params;
+    const { id } = pick(req.params, ['id']);
+    console.log(id, 'id...');
+    const project = await ProjectService.getProjectById(Number(id));
+    if (!project) {
+      res.status(httpStatus.NOT_FOUND).send('Project not found');
+    }
+    res.status(httpStatus.OK).send(project);
+    // res.status(data.status).json({
+    //   message: data.message,
+    //   data: data.data
+    // });
+  });
+
+  // async getProjectById(req: Request, res: Response) {
+  //   const { id = '' } = req.params;
+  //   const data = await ProjectService.getProjectById(Number(id));
+  //   res.status(data.status).json({
+  //     message: data.message,
+  //     data: data.data
+  //   });
+  // }
 
   async getProjectByUserId(req: Request, res: Response) {
-    const { userId = '' } = req.params;
-    const data = await ProjectService.getProjectsListByUserId(Number(userId));
+    // const { userId = '' } = req.params;
+    const { userId } = pick(req.params, ['userId']);
+    console.log(userId, 'userId...');
+    const data = await ProjectService.getProjectsByUserId(Number(userId));
     res.status(data.status).json({
       message: data.message,
       data: data.data

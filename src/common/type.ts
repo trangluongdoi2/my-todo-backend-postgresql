@@ -17,7 +17,6 @@ export interface TodoItem {
   title: string,
   todoStatus: TodoStatus,
   projectId: number,
-  // projects?: number[],
   label: string,
   description: string,
   priority: Priority,
@@ -27,4 +26,9 @@ export interface TodoItem {
 export interface TodoItemDetails extends TodoItem {
   id: string,
   attachments?: Array<{ id: string, filePath: string }>,
+}
+
+export type TAttachment = {
+  id: string,
+  filePath: string,
 }

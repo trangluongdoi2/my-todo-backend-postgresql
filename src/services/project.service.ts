@@ -57,22 +57,32 @@ class ProjectService {
     }
   }
 
-  async getProjectsList() {
-    try {
-      const res = await this.repository.find();
-      return {
-        status: 200,
-        message: "Todo list fetched successfully",
-        data: res,
-      }
-    } catch (error) {
-      return {
-        status: 500,
-        message: error,
-        data: [],
-      }
-    }
+  async getProjects() {
+    const projects = await this.repository.find();
+    return projects;
+    // try {
+    //   const res = await this.repository.find();
+    //   return {xw
+    //     status: 200,
+    //     message: "Todo list fetched successfully",
+    //     data: res,
+    //   }
+    // } catch (error) {
+    //   return {
+    //     status: 500,
+    //     message: error,
+    //     data: [],
+    //   }
+    // }
   }
+
+  // async getProjects = catchAsync(async (req: Request, res: Response) => {
+  //   const data = await this.getProjects();
+  //   res.status(data.status).json({
+  //     message: data.message,
+  //     data: data.data
+  //   });
+  // })
 
   async getProjectById(id: number) {
     try {
@@ -123,7 +133,7 @@ class ProjectService {
     }
   }
 
-  async getProjectsListByUserId(userId: number) {
+  async getProjectsByUserId(userId: number) {
     try {
       const res = await this.repository
         .createQueryBuilder('project')
