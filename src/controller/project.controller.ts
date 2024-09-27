@@ -1,101 +1,90 @@
 import { Request, Response } from 'express';
-import { v4 as uuidv4 } from 'uuid'; 
 import { ProjectItem } from '@/common/project';
 import ProjectService from '@/services/project.service';
 import { catchAsync } from '@/utils/catchAsync';
 import httpStatus from 'http-status';
 import { pick } from '@/utils/pick';
 class ProjectController {
-  // async getProjects(req: Request, res: Response) {
-  //   const data = await ProjectService.getProjects();
-  //   res.status(data.status).json({
-  //     message: data.message,
-  //     data: data.data
-  //   });
-  // }
-
   getProjects = catchAsync(async (req: Request, res: Response) => {
     const projects = await ProjectService.getProjects();
     res.status(httpStatus.OK).send(projects);
   });
 
   getProjectById = catchAsync(async (req: Request, res: Response) => {
-    // const { id = '' } = req.params;
     const { id } = pick(req.params, ['id']);
-    console.log(id, 'id...');
     const project = await ProjectService.getProjectById(Number(id));
-    if (!project) {
-      res.status(httpStatus.NOT_FOUND).send('Project not found');
-    }
-    res.status(httpStatus.OK).send(project);
-    // res.status(data.status).json({
-    //   message: data.message,
-    //   data: data.data
-    // });
+    res.status(httpStatus.OK).send({
+      message: 'Get project successfully',
+      data: project
+    });
   });
 
-  // async getProjectById(req: Request, res: Response) {
-  //   const { id = '' } = req.params;
-  //   const data = await ProjectService.getProjectById(Number(id));
-  //   res.status(data.status).json({
-  //     message: data.message,
-  //     data: data.data
-  //   });
-  // }
-
-  async getProjectByUserId(req: Request, res: Response) {
-    // const { userId = '' } = req.params;
+  getProjectByUserId = catchAsync(async (req: Request, res: Response) => {
     const { userId } = pick(req.params, ['userId']);
-    console.log(userId, 'userId...');
-    const data = await ProjectService.getProjectsByUserId(Number(userId));
-    res.status(data.status).json({
-      message: data.message,
-      data: data.data
+    const projects = await ProjectService.getProjectsByUserId(Number(userId));
+    res.status(httpStatus.OK).send({
+      message: 'Get project successfully',
+      data: projects
     });
-  }
+  });
 
-  async deleteProject(req: Request, res: Response) {
-    const { id = '' } = req.params;
-    const data = await ProjectService.deleteProjectById(Number(id));
-    res.status(data?.status).send(data?.message);
-  }
-  
-  async getMembersById(req: Request, res: Response) {
-    const { projectId = '' } = req.params;
-    const data = await ProjectService.getMembersById(Number(projectId));
-    res.status(data.status).json({
-      message: data.message,
-      data: data.data
-    });
-  }
-
-  async sentInviteMailToAddMember(req: Request, res: Response) {
-    const { fromEmail = '', destEmail = '' } = req.body;
-    const { projectId = '' } = req.params;
-    const data = await ProjectService.sentInviteMailToAddMember({ fromEmail, destEmail, projectId: Number(projectId) });
-    res.status(data.status).json({
-      message: data.message,
-      data: data.data
-    });
-  }
-
-  async addMember(req: Request, res: Response) {
-    const { email = '', projectId } = req.body;
-    const data = await ProjectService.addMember({ email, projectId });
-    res.status(200).send(data.message);
-  }
-
-  async createProject(req: Request, res: Response) {
-    const input: ProjectItem = {
-      ...req.body,
-      projectId: uuidv4(),
-    }
+  createProject = catchAsync(async (req: Request, res: Response) => {
+    const input: ProjectItem = { ...req.body }
     const data = await ProjectService.createProject(input);
     res.status(data.status).json({
       message: data.message,
       data: data.data
     });
-  }
+  });
+
+  updateProjectWithAttributes = catchAsync(async (req: Request, res: Response) => {
+    res.status(httpStatus.NOT_IMPLEMENTED).send({
+      message: 'Update project successfully',
+      data: [],
+    });
+  });
+
+  deleteProject = catchAsync(async (req: Request, res: Response) => {
+    const { id } = pick(req.params, ['id']);
+    const deletedProject = await ProjectService.deleteProjectById(Number(id));
+    res.status(httpStatus.OK).send({
+      message: 'Delete project successfully',
+      data: deletedProject
+    });
+  });
+
+  getMembersById = catchAsync(async (req: Request, res: Response) => {
+    const { projectId } = pick(req.params, ['projectId']);
+    const data = await ProjectService.getMembersById(Number(projectId));
+    res.status(httpStatus.OK).send({
+      message: 'Get members successfully',
+      data,
+    });
+  });
+
+  sendInviteMailToAddMember = catchAsync(async (req: Request, res: Response) => {
+    const { fromEmail, destEmail } = pick(req.body, ['fromEmail', 'destEmail']);
+    const { projectId } = pick(req.params, ['projectId']);
+    const data = await ProjectService.sentInviteMailToAddMember({ fromEmail, destEmail, projectId: Number(projectId) });
+    res.status(httpStatus.OK).json({
+      message: 'Sent invite mail successfully',
+      data,
+    });
+  });
+
+  addMember = catchAsync(async (req: Request, res: Response) => {
+    const { email, projectId } = pick(req.body, ['email', 'projectId']);
+    const data = await ProjectService.addMember({ email, projectId });
+    res.status(httpStatus.OK).send(data.message);
+  });
+
+  removeMember = catchAsync(async (req: Request, res: Response) => {
+    console.log('removeMember...');
+    res.status(httpStatus.NOT_IMPLEMENTED).send({
+      message: 'Remove member successfully',
+      data: [],
+    });
+  });
 }
 
 export default new ProjectController();

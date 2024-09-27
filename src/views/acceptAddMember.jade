@@ -5,16 +5,17 @@ script.
       projectId: !{projectId},
       email: !{email},
     }
-    fetch('http://localhost:9998/api/member/add-by-email', {
+    const api_url = !{url};
+    fetch(`${api_url}`, {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(input)
+      body: JSON.stringify(input),
     }).then(() => {
       setTimeout(() => {
         window.close();
-      }, 1000)
+      }, 1000);
     });
   })()

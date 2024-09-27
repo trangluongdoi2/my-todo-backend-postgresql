@@ -9,6 +9,6 @@ router.get('/projects-list/:userId', AuthMiddleware.authentication, ProjectContr
 router.post('/projects/create', AuthMiddleware.authentication, ProjectController.createProject);
 router.delete('/projects/delete/:id', AuthMiddleware.authentication, ProjectController.deleteProject);
 router.get('/projects/members-list/:projectId', AuthMiddleware.authentication, ProjectController.getMembersById);
-router.post('/projects/send-invite-mail/:projectId', ProjectController.sentInviteMailToAddMember);
+router.post('/projects/send-invite-mail/:projectId', ProjectController.sendInviteMailToAddMember);
 
 export default router;

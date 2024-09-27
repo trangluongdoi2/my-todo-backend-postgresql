@@ -2,13 +2,15 @@ import jade from 'jade';
 import fs from 'fs';
 import path from 'path';
 import { Repository } from 'typeorm';
-import { v4 as uuidv4 } from 'uuid';
 import { ProjectItem } from '@/common/project';
 import { AppDataSource } from '@/config/db-connection';
 import { Project } from '@/entity/project.entity';
 import { Todo } from '@/entity/todo.entity';
 import { User } from '@/entity/user.entity';
 import MailService from './mail.service';
+import ApiError from '@/utils/apiError';
+import httpStatus from 'http-status';
+import config from '@/config';
 
 class ProjectService {
   private repository: Repository<Project>;
@@ -24,19 +26,16 @@ class ProjectService {
     try {
       const { members = [] } = input;
       const userId = members[0];
-      const user = await this.userRepository.findOne(
-        {
-          where: {
-            id: Number(userId),
-          },
-          relations: {
-            projects: true,
-          }
+      const user = await this.userRepository.findOne({
+        where: {
+          id: Number(userId),
+        },
+        relations: {
+          projects: true,
         }
-      );
+      });
       const res = await this.repository.save({
         ...input,
-        projectId: uuidv4(),
       });
 
       if (user) {
@@ -60,133 +59,61 @@ class ProjectService {
   async getProjects() {
     const projects = await this.repository.find();
     return projects;
-    // try {
-    //   const res = await this.repository.find();
-    //   return {xw
-    //     status: 200,
-    //     message: "Todo list fetched successfully",
-    //     data: res,
-    //   }
-    // } catch (error) {
-    //   return {
-    //     status: 500,
-    //     message: error,
-    //     data: [],
-    //   }
-    // }
   }
 
-  // async getProjects = catchAsync(async (req: Request, res: Response) => {
-  //   const data = await this.getProjects();
-  //   res.status(data.status).json({
-  //     message: data.message,
-  //     data: data.data
-  //   });
-  // })
-
   async getProjectById(id: number) {
-    try {
-      const res = await this.repository.findOne({
-        where: {
-          id,
-        },
-      });
-      return {
-        status: 200,
-        message: "Todo list fetched successfully",
-        data: res,
-      }
-    } catch (error) {
-      return {
-        status: 500,
-        message: error,
-        data: [],
-      }
+    const project = await this.repository.findOne({ where: { id } });
+    if (!project) {
+      throw new ApiError(httpStatus.NOT_FOUND, 'Project not found');
     }
+    return project;
   }
 
   async deleteProjectById(id: number) {
-    try {
-      const project = await this.repository.findOne({
-        where: {
-          id,
-        },
-        relations: {
-          todos: true,
-        }
-      })
-      if (project) {
-        const { todos = [] } = project;
-        todos.forEach((todo: Todo) => {
-          this.userRepository.delete(todo.id);
-        })
-      }
-      return {
-        status: 200,
-        message: 'Delete project successfully!',
-      }
-    } catch (error) {
-      return {
-        status: 500,
-        message: 'Delete project failed!',
-      }
+    const project = await this.repository.findOne({
+      where: { id },
+      relations: { todos: true },
+    })
+    if (!project) {
+      throw new ApiError(httpStatus.NOT_FOUND, 'Project not found');
     }
+    const { todos = [] } = project;
+    todos.forEach((todo: Todo) => {
+      this.userRepository.delete(todo.id);
+    });
+    return project;
   }
 
   async getProjectsByUserId(userId: number) {
-    try {
-      const res = await this.repository
-        .createQueryBuilder('project')
-        .leftJoinAndSelect('project.members', 'member')
-        .where('member.id = :userId', { userId })
-        .leftJoinAndSelect('project.todos', 'todo')
-        .getMany();
-      return {
-        status: 200,
-        message: 'Noooo',
-        data: res,
-      }
-    } catch (error) {
-      return {
-        status: 500,
-        message: error,
-        data: [],
-      }
-    }
+    const project = await this.repository
+      .createQueryBuilder('project')
+      .leftJoinAndSelect('project.members', 'member')
+      .where('member.id = :userId', { userId })
+      .leftJoinAndSelect('project.todos', 'todo')
+      .getMany();
+    return project;
   }
 
   async getMembersById(id: number) {
-    try {
-      const res = await this.repository.findOne({
-        where: {
-          id,
-        },
-        relations: {
-          members: true,
-        }
-      });
-      const { members = [] } = res as unknown as ProjectItem;
-      return {
-        status: 200,
-        message: 'oke',
-        data: members,
-      }
-    } catch (error) {
-      return {
-        status: 500,
-        message: error,
-        data: [],
-      }
-    }
+    const project = await this.repository.findOne({
+      where: { id },
+      relations: { members: true },
+    });
+    const { members = [] } = project as unknown as ProjectItem;
+    return members;
   }
 
   async sentInviteMailToAddMember(input: { fromEmail: string, destEmail: string, projectId: number }) {
     const { fromEmail = '', destEmail = '', projectId } = input;
-    const { data } = await this.getProjectById(projectId) as any;
+    const data = await this.getProjectById(projectId) as any;
     const user = await this.getMemberByEmail(destEmail);
+    if (!user) {
+      throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+    }
     const pathTemplate = path.resolve(__dirname, '../views/templateEmail.jade');
     const fnTemplate = jade.compile(fs.readFileSync(pathTemplate, { encoding: 'utf-8' }));
     const info = {
+      host: config.host,
       fromEmail,
       destEmail,
       projectInfos: {
@@ -206,22 +133,13 @@ class ProjectService {
       text: `You recieved message from ${fromEmail}`,
       html,
     };
-    try {
-      transporter.sendMail(mainOptions, (err: any, info: any) => {
-        if (err) {
-          return false;
-        } else {
-          return true;
-        }
-      });
-    } catch (error) {
-      console.log(error, 'error...');
-    }
-    return {
-      status: 500,
-      message: '',
-      data: '',
-    }
+    transporter.sendMail(mainOptions, (err: any, info: any) => {
+      if (err) {
+        return false;
+      } else {
+        return true;
+      }
+    });
   }
 
   async getMemberByEmail(email: string) {
@@ -262,7 +180,6 @@ class ProjectService {
         message: 'Add member failed!',
       }
     }
-    
   }
 }
 

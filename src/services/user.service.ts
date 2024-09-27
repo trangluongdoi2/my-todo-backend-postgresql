@@ -15,51 +15,27 @@ class UserServices {
   }
 
   async getAllUser() {
-    try {
-      const res = await this.entity.createQueryBuilder('User')
-        .select('User.username, User.email, User.role')
-        .execute();
-      return {
-        status: 200,
-        message: 'Fetch all User!',
-        data: res,
-      }
-    } catch (error) {
-      return {
-        status: 500,
-        message: 'Fetch all User failed!',
-        data: null,
-      }
-    }
+    const res = await this.entity.createQueryBuilder('User')
+      .select('User.username, User.email, User.role')
+      .execute();
+    return res;
   }
 
   async createUser(input: UserCreate) {
-    try {
-      const { username, email, password } = input;
-      const newUser = new User();
-      newUser.username = username;
-      newUser.email = email;
-      const salt = await bcrypt.genSalt(10);
-      const hashPassword = await bcrypt.hash(password.toString(), salt);
-      newUser.password = hashPassword;
-      const { password: hashedPassword, ...res } = await this.entity.save(newUser);
-      const accessToken = Encrypt.generateToken({ id: res.id.toString() });
-      const refreshToken = Encrypt.generateToken({ id: res.id.toString() });
-      return {
-        status: 200,
-        message: 'Created user successfully!',
-        data: {
-          ...res,
-          accessToken,
-          refreshToken,
-        },
-      }
-    } catch (error) {
-      return {
-        status: 500,
-        message: 'Created user failed!',
-        data: null,
-      };
+    const { username, email, password } = input;
+    const newUser = new User();
+    newUser.username = username;
+    newUser.email = email;
+    const salt = await bcrypt.genSalt(10);
+    const hashPassword = await bcrypt.hash(password.toString(), salt);
+    newUser.password = hashPassword;
+    const { password: hashedPassword, ...res } = await this.entity.save(newUser);
+    const accessToken = Encrypt.generateToken({ id: res.id.toString() });
+    const refreshToken = Encrypt.generateToken({ id: res.id.toString() });
+    return {
+      ...res,
+      accessToken,
+      refreshToken,
     }
   }
 
@@ -83,8 +59,7 @@ class UserServices {
     }
   }
 
-  async logout(input: any) {
-  }
+  async logout(input: any) {}
 
   async getRefreshToken(token: string) {
     const id = await AuthMiddleWare.verifyRefreshToken(token);
@@ -101,32 +76,18 @@ class UserServices {
     };
   }
 
-  async findUserById(userId: string) {
-    return {
-      status: 200,
-      message: 'Hehhe',
-      data: null,
-    }
+  async getUserById(id: number) {
+    const user = await this.entity.findOneBy({ id });
+    return user;
   }
 
   async deleteUser(id: number) {
-    try {
-      const user = await this.entity.findOneBy({ id: Number(id) })
-      if (user) {
-        this.entity.remove(user);
-      }
-      return { 
-        status: 200,
-        message: 'Delete user successfully!',
-        data: null,
-      }
-    } catch (error) {
-      return {
-        status: 500,
-        message: JSON.stringify(error),
-        data: null,
-      }
+    const user = await this.getUserById(id);
+    if (!user) {
+      throw new ApiError(httpStatus.BAD_REQUEST, 'User is not exist!');
     }
+    const result = await this.entity.remove(user);
+    return result;
   }
 }
 

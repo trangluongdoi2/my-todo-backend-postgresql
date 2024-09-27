@@ -16,22 +16,18 @@ class AuthMiddleWare {
     try {
       const header = req.headers?.authorization;
       if (!header) {
-        // return res.status(401).json({ message: "Unauthorized" });
         throw new ApiError(httpStatus.UNAUTHORIZED, 'Unauthorized')
       }
       const token = header.split(" ")[1];
       if (!token) {
-        // return res.status(401).json({ message: "Unauthorized" });
         throw new ApiError(httpStatus.UNAUTHORIZED, 'Unauthorized')
       }
       const decode = JWT.verify(token, config.jwt.key as string);
       if (!decode) {
-        // return res.status(401).json({ message: "Unauthorized" });
         throw new ApiError(httpStatus.UNAUTHORIZED, 'Unauthorized')
       }
       next();
     } catch (error) {
-      // res.status(401).json({ message: 'Invalid token!' });
       throw new ApiError(httpStatus.UNAUTHORIZED, 'Invalid Token')
     }
   }

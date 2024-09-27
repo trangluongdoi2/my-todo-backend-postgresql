@@ -4,6 +4,7 @@ import path from 'path';
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 const config = {
   app_port: process.env.PORT || 9998,
+  host: process.env.NODE_ENV === 'production' ? 'https://server.trangluongdoi2.com' : `http://localhost:${process.env.PORT}`,
   postgresql: {
     user: process.env.POSTGRES_USER,
     host: process.env.POSTGRES_HOST,

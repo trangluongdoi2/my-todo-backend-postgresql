@@ -32,7 +32,7 @@ function initApp() {
       app.use('/api', projectRoute);
       app.use('/api', addMemberRoute);
       app.get('/', (_, res: Response) => {
-        res.send('<h1>My Todo App WTF!!</h1>');
+        res.send('<h1>My Todo App!!</h1>');
       });
       swaggerPlugin(app);
       app.listen(config.app_port, () => {

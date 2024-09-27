@@ -1,49 +1,51 @@
 import { Request, Response } from "express";
 import TodoService from "@/services/todo.service";
 import UploadS3Service from '@/services/upload.service';
+import { catchAsync } from '@/utils/catchAsync';
+import httpStatus from 'http-status';
 
 class TodoController {
-  async getTodos(req: Request, res: Response) {
+  getTodos = catchAsync(async (req: Request, res: Response) => {
     const data = await TodoService.getTodos();
-    res.status(data.status).json({
-      message: data.message,
-      data: data.data
+    res.status(httpStatus.OK).json({
+      message: '',
+      data,
     });
-  }
+  });
 
-  async getTodoById(req: Request, res: Response) {
+  getTodoById = catchAsync(async (req: Request, res: Response) => {
     const data = await TodoService.getTodoById(Number(req.params.id));
-    res.status(data.status).json({
-      message: data.message,
-      data: data.data
+    res.status(httpStatus.OK).json({
+      message: 'Get todo successfully!',
+      data,
     });
-  }
+  });
 
-  async getTodosListByProjectId(req: Request, res: Response) {
-    const data = await TodoService.getTodosListByProjectId(Number(req.params.projectId));
-    res.status(data.status).json({
-      message: data.message,
-      data: data.data
+  getTodosByProjectId = catchAsync(async (req: Request, res: Response) => {
+    const data = await TodoService.getTodosByProjectId(Number(req.params.projectId));
+    res.status(httpStatus.OK).json({
+      message: 'Get todos successfully!',
+      data,
     });
-  }
+  });
 
-  async createTodo(req: Request, res: Response) {
+  createTodo = catchAsync(async (req: Request, res: Response) => {
     const data = await TodoService.createTodo(req.body);
-    res.status(data.status).json({
-      message: data.message,
-      data: data.data
+    res.status(httpStatus.CREATED).json({
+      message: 'Create todo successfully!',
+      data,
     });
-  }
+  });
   
-  async updateTodo(req: Request, res: Response) {
+  updateTodo = catchAsync(async (req: Request, res: Response) => {
     const data = await TodoService.updateTodo(req.body as any);
-    res.status(data.status).json({
-      message: data.message,
-      data: data.data
+    res.status(httpStatus.OK).json({
+      message: 'Update todo successfully!',
+      data,
     });
-  }
+  });
 
-  async updateTodoByField(req: Request, res: Response) {
+  updateTodoByField = catchAsync(async (req: Request, res: Response) => {
     const { id } = req.params;
     const { field, value } = req.body;
     const input = {
@@ -52,44 +54,46 @@ class TodoController {
       value,
     }
     const data = await TodoService.updateTodoByField(input);
-    res.status(data.status).json({
-      message: data.message,
-      data: data.data
+    res.status(httpStatus.OK).json({
+      message: 'Update todo successfully!',
+      data,
     });
-  }
+  });
 
-  async uploadImages(req: Request, res: Response) {
+  uploadImages = catchAsync(async (req: Request, res: Response) => {
     const id = req.body.id || '';
     const uploadedFiles = await UploadS3Service.handle((req?.files as any) || []);
     if (!uploadedFiles.length) {
-      res.status(500).send('Uploaded Failed!');
+      res.status(httpStatus.INTERNAL_SERVER_ERROR).send('Upload Failed!');
       return;
     }
     const data = await TodoService.updateAttachments({ id, files: uploadedFiles });
-    res.status(data.status).json({
-      message: data.message,
-      data: data.data
+    res.status(httpStatus.OK).json({
+      message: 'Upload successfully!',
+      data,
     });
-  }
+  });
 
-  async downloadImage(req: Request, res: Response) {
+  downloadImage = catchAsync(async (req: Request, res: Response) => {
     const key = req.params.key || '';
     const data = await UploadS3Service.getObject(key);
     if (!data) {
-      res.status(500);
+      res.status(httpStatus.INTERNAL_SERVER_ERROR).send('Download Failed!');
     } else {
-      res.status(200).json({
+      res.status(httpStatus.OK).json({
         message: 'Download successfully!',
-        data: data
+        data,
       });
     }
-  }
+  });
 
-  async deleteTodo(req: Request, res: Response) {
+  deleteTodo = catchAsync(async (req: Request, res: Response) => {
     const data = await TodoService.deleteTodo(Number(req.params.id));
-    res.status(data.status).send(data.message);
-  }
+    res.status(httpStatus.OK).json({
+      message: 'Delete todo successfully!',
+      data,
+    });
+  });
 }
 
 export const todoController = new TodoController();
-
