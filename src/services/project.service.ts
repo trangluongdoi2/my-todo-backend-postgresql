@@ -23,37 +23,23 @@ class ProjectService {
   }
 
   async createProject(input: ProjectItem) {
-    try {
-      const { members = [] } = input;
-      const userId = members[0];
-      const user = await this.userRepository.findOne({
-        where: {
-          id: Number(userId),
-        },
-        relations: {
-          projects: true,
-        }
-      });
-      const res = await this.repository.save({
-        ...input,
-      });
-
-      if (user) {
-        user.projects = [...user.projects || [], res];
-        await this.userRepository.save(user);
+    const { members = [] } = input;
+    const userId = members[0];
+    const user = await this.userRepository.findOne({
+      where: {
+        id: Number(userId),
+      },
+      relations: {
+        projects: true,
       }
-      return {
-        status: 200,
-        message: "Create project successfully",
-        data: res,
-      }
-    } catch (error) {
-      return {
-        status: 500,
-        message: error,
-        data: [],
-      }
+    });
+    if (!user) {
+      throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Create project failed!');
     }
+    const res = await this.repository.save({ ...input });
+    user.projects = [...user.projects || [], res];
+    await this.userRepository.save(user);
+    return res;
   }
 
   async getProjects() {
@@ -156,29 +142,22 @@ class ProjectService {
 
   async addMember(input: any) {
     const { email = '', projectId } = input;
-    try {
-      const user = await this.getMemberByEmail(email);
-      const project = await this.repository.findOne({
-        where: {
-          id: projectId,
-        },
-        relations: {
-          members: true,
-        }
-      })
-      if (project && user) {
-        project.members = [...project.members, user];
-        this.repository.save(project);
+    const user = await this.getMemberByEmail(email);
+    const project = await this.repository.findOne({
+      where: {
+        id: projectId,
+      },
+      relations: {
+        members: true,
       }
-      return {
-        status: 200,
-        message: 'Add member successfully!',
-      }
-    } catch (error) {
-      return {
-        status: 500,
-        message: 'Add member failed!',
-      }
+    });
+    if (!project || !user) {
+      throw new ApiError(httpStatus.NOT_FOUND, 'Add member failed!');
+    }
+    if (project && user) {
+      project.members = [...project.members, user];
+      const newProject = await this.repository.save(project);
+      return newProject;
     }
   }
 }

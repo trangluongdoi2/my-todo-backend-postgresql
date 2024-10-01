@@ -30,10 +30,10 @@ class ProjectController {
 
   createProject = catchAsync(async (req: Request, res: Response) => {
     const input: ProjectItem = { ...req.body }
-    const data = await ProjectService.createProject(input);
-    res.status(data.status).json({
-      message: data.message,
-      data: data.data
+    const newProject = await ProjectService.createProject(input);
+    res.status(httpStatus.OK).send({
+      message: 'Create project successfully',
+      data: newProject
     });
   });
 
@@ -74,13 +74,16 @@ class ProjectController {
 
   addMember = catchAsync(async (req: Request, res: Response) => {
     const { email, projectId } = pick(req.body, ['email', 'projectId']);
-    const data = await ProjectService.addMember({ email, projectId });
-    res.status(httpStatus.OK).send(data.message);
+    const newProject = await ProjectService.addMember({ email, projectId });
+    res.status(httpStatus.OK).send({
+      message: 'Add member successfully',
+      data: newProject
+    });
   });
 
   removeMember = catchAsync(async (req: Request, res: Response) => {
     console.log('removeMember...');
-    res.status(httpStatus.NOT_IMPLEMENTED).send({
+    res.status(httpStatus.OK).send({
       message: 'Remove member successfully',
       data: [],
     });
