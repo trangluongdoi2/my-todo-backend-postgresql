@@ -30,8 +30,8 @@ class UserServices {
     const hashPassword = await bcrypt.hash(password.toString(), salt);
     newUser.password = hashPassword;
     const { password: hashedPassword, ...res } = await this.entity.save(newUser);
-    const accessToken = Encrypt.generateToken({ id: res.id.toString() });
-    const refreshToken = Encrypt.generateToken({ id: res.id.toString() });
+    const accessToken = Encrypt.generateToken({ userId: res.id.toString() });
+    const refreshToken = Encrypt.generateToken({ userId: res.id.toString() });
     return {
       ...res,
       accessToken,
@@ -49,8 +49,8 @@ class UserServices {
     if (!flag) {
       throw new ApiError(httpStatus.BAD_REQUEST, 'Password is not match!');
     }
-    const accessToken = Encrypt.generateToken({ id: user.id });
-    const refreshToken = Encrypt.generateRefreshToken({ id: user.id });
+    const accessToken = Encrypt.generateToken({ userId: user.id });
+    const refreshToken = Encrypt.generateRefreshToken({ userId: user.id });
     const { password: hashedPassword, ...args } = user;
     return {
       ...args,

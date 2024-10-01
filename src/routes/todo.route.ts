@@ -1,7 +1,7 @@
 import { Router } from "express";
+import multer from "multer";
 import { todoController } from "@/controller/todo.controller";
 import AuthMiddleWare from "@/middleware/auth.middleware";
-import multer from "multer";
 
 const uploadMiddleWare = multer();
 const router = Router();

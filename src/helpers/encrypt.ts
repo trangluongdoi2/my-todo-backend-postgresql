@@ -15,6 +15,9 @@ class Encrypt {
   generateRefreshToken(payload: Record<string, any>) {
     return jwt.sign(payload, config.jwt.key as string, { expiresIn: OPTIONS.REFRESH_TOKEN_TIME_ALIVE });
   }
+  getInfoFromToken(token: string) {
+    return jwt.verify(token, config.jwt.key as string);
+  }
 }
 
 export default new Encrypt();

@@ -1,15 +1,14 @@
-import express, { response, Response} from 'express';
+import express, { Response } from 'express';
+import path from 'path';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import todoRoute from '@/routes/todo.route';
 import userRoute from '@/routes/user.route';
 import addMemberRoute from '@/routes/confirmAddMember.route';
-// import addMemberRoute from '@/routes/confirmAddMember.route';
 import projectRoute from '@/routes/project.route';
+import { AppDataSource } from '@/config/db-connection';
 import swaggerPlugin from '@/config/swagger';
 import config from './config';
-import { AppDataSource } from '@/config/db-connection';
-import path from 'path';
 
 function initApp() {
   try {

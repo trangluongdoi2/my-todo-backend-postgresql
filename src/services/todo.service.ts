@@ -1,21 +1,29 @@
 import { v4 as uuidv4 } from 'uuid';
 import { Repository } from 'typeorm';
-import { TodoItem, TodoItemDetails } from '@/common/type';
+import httpStatus from 'http-status';
+import { TodoItem, TodoItemDetails } from '@/types/todo';
 import { AppDataSource } from '@/config/db-connection';
+import ApiError from '@/utils/apiError';
 import { Project } from '@/entity/project.entity';
 import { Todo } from '@/entity/todo.entity';
 import { Attachment } from '@/entity/attachment.entity';
-import ApiError from '@/utils/apiError';
-import httpStatus from 'http-status';
+import { TodoStatusLog } from '@/entity/todo_status_log';
+import projectService from './project.service';
+// import { User } from '@/common/user';
+import { User } from '@/entity/user.entity';
 
 class TodoService {
   private repository: Repository<Todo>;
   private projectRepository: Repository<Project>;
   private attachmentRepository: Repository<Attachment>;
+  private todoStatusLogRepository: Repository<TodoStatusLog>;
+  private userRepository: Repository<User>;
   constructor() {
     this.repository = AppDataSource.getRepository(Todo);
     this.projectRepository = AppDataSource.getRepository(Project);
     this.attachmentRepository = AppDataSource.getRepository(Attachment);
+    this.todoStatusLogRepository = AppDataSource.getRepository(TodoStatusLog);
+    this.userRepository = AppDataSource.getRepository(User);
   }
   async getTodos() {
     const todos = await this.repository.find();
@@ -23,10 +31,16 @@ class TodoService {
   }
 
   async getTodoById(id: number) {
-    const todo = await this.repository.findOne({
-      where: { id },
-      relations: { attachments: true },
-    });
+    // const todo = await this.repository.findOne({
+    //   where: { id },
+    //   relations: { statusLogs: true, attachments: true },
+    // });
+    const todo = await this.repository.createQueryBuilder('todo')
+      .leftJoinAndSelect('todo.statusLogs', 'statusLogs')
+      .leftJoinAndSelect('todo.attachments', 'attachments')
+      .where('todo.id = :id', { id })
+      .getOne();
+    console.log(JSON.parse(JSON.stringify(todo)), 'getTodoById..');
     return todo;
   }
 
@@ -39,8 +53,34 @@ class TodoService {
     return todos;
   }
 
-  async createTodo(input: TodoItem) {
-    const res = await this.repository.save(input);
+  private async createTodoLog(input: any) {
+    const { userId } = input;
+    const user = await this.userRepository.findOneBy({ id: userId });
+    const newTodoStatusLog = new TodoStatusLog();
+    newTodoStatusLog.field = input.field as keyof TodoItem;
+    newTodoStatusLog.oldValue = input.oldValue;
+    newTodoStatusLog.newValue = input.newValue;
+    newTodoStatusLog.action = input.action;
+    newTodoStatusLog.user = user as User;
+    const savedTodoStatusLog = await this.todoStatusLogRepository.save(newTodoStatusLog);
+    console.log(savedTodoStatusLog, 'savedTodoStatusLog');
+    return savedTodoStatusLog;
+  }
+
+  async createTodo(userId: number, input: TodoItem) {
+    const inputLogs = {
+      oldValue: '',
+      newValue: '',
+      field: 'todoStatus',
+      action: 'create',
+      userId,
+    }
+    const savedTodoStatusLog = await this.createTodoLog(inputLogs);
+    const newTodo = {
+      ...input,
+      statusLogs: [savedTodoStatusLog],
+    }
+    const createdTodo = await this.repository.save(newTodo);
     const project = await this.projectRepository.findOne({
       where: {
         id: input.projectId,
@@ -50,10 +90,10 @@ class TodoService {
       }
     });
     if (project) {
-      project.todos = [...project.todos, res];
+      project.todos = [...project.todos, createdTodo];
       await this.projectRepository.save(project);
     }
-    return res;
+    return createdTodo;
   }
 
   async updateTodo(input: TodoItemDetails) {
@@ -63,17 +103,33 @@ class TodoService {
     return updatedTodo;
   }
 
-  async updateTodoByField(input: { id: string , field: string, value: any }) {
+  async updateTodoByField(userId: number, input: { id: string , field: string, value: any }) {
     const { id, field, value } = input;
-    const todoNeedUpdate = await this.repository.findOneBy({ id: id as any });
-    let newUpdateTodo;
-    if (todoNeedUpdate) {
-      newUpdateTodo = { 
-        ...todoNeedUpdate,
-        [field]: value,
+    const todoNeedUpdate = await this.repository.findOne(
+      {
+        where: { id: id as any },
+        relations: { statusLogs: true },
       }
+    ) as Todo;
+    if (!todoNeedUpdate) {
+      throw new ApiError(httpStatus.EXPECTATION_FAILED, 'Update todo failed!');
     }
-    const updatedTodo = await this.repository.save(newUpdateTodo as any);
+    let newUpdateTodo;
+    const inputLogs = {
+      // @ts-ignore
+      oldValue: todoNeedUpdate[field as keyof TodoItem],
+      newValue: value,
+      field,
+      action: 'update',
+      userId,
+    }
+    const newTodoStatusLog = await this.createTodoLog(inputLogs);
+    todoNeedUpdate.statusLogs = [...todoNeedUpdate.statusLogs, newTodoStatusLog];
+    newUpdateTodo = { 
+      ...todoNeedUpdate,
+      [field]: value,
+    }
+    const updatedTodo = await this.repository.save(newUpdateTodo);
     return updatedTodo;
   }
 
@@ -93,8 +149,19 @@ class TodoService {
   }
 
   async deleteTodo(id: number) {
-    const deletedTodo = await this.repository.delete({ id: id });
-    return deletedTodo;
+    const todo = await this.repository.findOne({
+      where: { id },
+      relations: { statusLogs: true },
+    })
+    if (!todo) {
+      throw new ApiError(httpStatus.NOT_FOUND, 'Todo not found');
+    }
+    const { statusLogs = [] } = todo;
+    statusLogs.forEach((statusLog: TodoStatusLog) => {
+      this.todoStatusLogRepository.delete(statusLog.id);
+    });
+    const deleteTodo = await this.repository.delete(id);
+    return deleteTodo;
   }
 }
 

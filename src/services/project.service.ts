@@ -1,6 +1,7 @@
 import jade from 'jade';
 import fs from 'fs';
 import path from 'path';
+import httpStatus from 'http-status';
 import { Repository } from 'typeorm';
 import { ProjectItem } from '@/common/project';
 import { AppDataSource } from '@/config/db-connection';
@@ -9,7 +10,6 @@ import { Todo } from '@/entity/todo.entity';
 import { User } from '@/entity/user.entity';
 import MailService from './mail.service';
 import ApiError from '@/utils/apiError';
-import httpStatus from 'http-status';
 import config from '@/config';
 
 class ProjectService {

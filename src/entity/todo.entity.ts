@@ -2,14 +2,16 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Priority, TodoStatus } from '@/common/type';
+import { Priority, TodoStatus } from '@/types/todo';
 import { Attachment } from '@/entity/attachment.entity';
 import { Project } from '@/entity/project.entity';
+import { TodoStatusLog } from './todo_status_log';
 
 @Entity()
 export class Todo {
@@ -51,4 +53,7 @@ export class Todo {
 
   @OneToMany(() => Attachment, (attachment: any) => attachment.todo)
   attachments: any;
+
+  @OneToMany(() => TodoStatusLog, (statusLog: any) => statusLog.todo)
+  statusLogs: TodoStatusLog[];
 }
