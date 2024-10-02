@@ -4,8 +4,6 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   ManyToOne,
-  OneToOne,
-  JoinColumn,
 } from 'typeorm';
 import { Todo } from './todo.entity';
 import { TodoItem } from '@/types/todo';

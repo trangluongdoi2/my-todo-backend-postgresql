@@ -8,8 +8,6 @@ import { Project } from '@/entity/project.entity';
 import { Todo } from '@/entity/todo.entity';
 import { Attachment } from '@/entity/attachment.entity';
 import { TodoStatusLog } from '@/entity/todo_status_log';
-import projectService from './project.service';
-// import { User } from '@/common/user';
 import { User } from '@/entity/user.entity';
 
 class TodoService {
@@ -31,17 +29,41 @@ class TodoService {
   }
 
   async getTodoById(id: number) {
-    // const todo = await this.repository.findOne({
-    //   where: { id },
-    //   relations: { statusLogs: true, attachments: true },
-    // });
     const todo = await this.repository.createQueryBuilder('todo')
-      .leftJoinAndSelect('todo.statusLogs', 'statusLogs')
-      .leftJoinAndSelect('todo.attachments', 'attachments')
-      .where('todo.id = :id', { id })
-      .getOne();
-    console.log(JSON.parse(JSON.stringify(todo)), 'getTodoById..');
+    .leftJoinAndSelect('todo.statusLogs', 'statusLogs')
+    .leftJoinAndSelect('statusLogs.user', 'user')
+    .leftJoinAndSelect('todo.attachments', 'attachments')
+    .where('todo.id = :id', { id })
+    .select([
+      'todo',
+      'statusLogs',
+      'attachments',
+      'user.id',
+      'user.username',
+      'user.email',
+    ])
+    .getOne();
     return todo;
+  }
+
+  async getTodoById2(id: number) {
+    const todo = await this.repository.findOne({
+      where: { id },
+      relations: { statusLogs: true, attachments: true },
+    })
+    const { statusLogs = [] } = todo as any;
+    const newStatusLogs = await Promise.all(statusLogs.map(async (statusLog: any) => {
+      const res = await this.todoStatusLogRepository.createQueryBuilder('todoStatusLog')
+        .leftJoin('todoStatusLog.user', 'user')
+        .where('todoStatusLog.id = :id', { id: statusLog.id })
+        .addSelect(['user.id', 'user.username', 'user.email'])
+        .getMany();
+      return res;
+    }));
+    return {
+      ...todo,
+      statusLogs: newStatusLogs,
+    };
   }
 
   async getTodosByProjectId(projectId: number) {
@@ -63,7 +85,6 @@ class TodoService {
     newTodoStatusLog.action = input.action;
     newTodoStatusLog.user = user as User;
     const savedTodoStatusLog = await this.todoStatusLogRepository.save(newTodoStatusLog);
-    console.log(savedTodoStatusLog, 'savedTodoStatusLog');
     return savedTodoStatusLog;
   }
 
@@ -71,7 +92,7 @@ class TodoService {
     const inputLogs = {
       oldValue: '',
       newValue: '',
-      field: 'todoStatus',
+      field: '',
       action: 'create',
       userId,
     }
@@ -121,7 +142,6 @@ class TodoService {
       newValue: value,
       field,
       action: 'update',
-      userId,
     }
     const newTodoStatusLog = await this.createTodoLog(inputLogs);
     todoNeedUpdate.statusLogs = [...todoNeedUpdate.statusLogs, newTodoStatusLog];
