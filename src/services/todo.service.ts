@@ -171,14 +171,17 @@ class TodoService {
   async deleteTodo(id: number) {
     const todo = await this.repository.findOne({
       where: { id },
-      relations: { statusLogs: true },
+      relations: { statusLogs: true, attachments: true },
     })
     if (!todo) {
       throw new ApiError(httpStatus.NOT_FOUND, 'Todo not found');
     }
-    const { statusLogs = [] } = todo;
+    const { statusLogs = [], attachments = [] } = todo;
     statusLogs.forEach((statusLog: TodoStatusLog) => {
       this.todoStatusLogRepository.delete(statusLog.id);
+    });
+    attachments.forEach((attachment: Attachment) => {
+      this.attachmentRepository.delete(attachment.id);
     });
     const deleteTodo = await this.repository.delete(id);
     return deleteTodo;

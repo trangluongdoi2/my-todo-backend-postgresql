@@ -33,10 +33,10 @@ class TodoController {
   createTodo = catchAsync(async (req: Request, res: Response) => {
     const token = req.headers.authorization?.split(' ')[1] as string;
     const getInfoFromToken = Encrypt.getInfoFromToken(token) as { userId: number };
-    const data = await TodoService.createTodo(getInfoFromToken.userId, req.body);
+    const newTodo = await TodoService.createTodo(getInfoFromToken.userId, req.body);
     res.status(httpStatus.CREATED).send({
       message: 'Create todo successfully!',
-      data,
+      data: newTodo,
     });
   });
   
@@ -69,7 +69,9 @@ class TodoController {
     const id = req.body.id || '';
     const uploadedFiles = await UploadS3Service.handle((req?.files as any) || []);
     if (!uploadedFiles.length) {
-      res.status(httpStatus.INTERNAL_SERVER_ERROR).send('Upload Failed!');
+      res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
+        message: 'Upload failed!',
+      });
       return;
     }
     const data = await TodoService.updateAttachments({ id, files: uploadedFiles });
@@ -94,7 +96,7 @@ class TodoController {
 
   deleteTodo = catchAsync(async (req: Request, res: Response) => {
     const data = await TodoService.deleteTodo(Number(req.params.id));
-    res.status(200).send({
+    res.status(httpStatus.OK).send({
       message: 'Delete todo successfully!',
       data,
     });
