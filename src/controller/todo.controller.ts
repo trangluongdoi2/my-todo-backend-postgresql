@@ -1,9 +1,11 @@
 import { Request, Response } from "express";
+import { pick } from "@/utils/pick";
 import TodoService from "@/services/todo.service";
 import UploadS3Service from '@/services/upload.service';
 import { catchAsync } from '@/utils/catchAsync';
 import Encrypt from '@/helpers/encrypt';
 import httpStatus from 'http-status';
+import TodoCommentService from "@/services/todo-comment.service";
 
 class TodoController {
   getTodos = catchAsync(async (req: Request, res: Response) => {
@@ -39,7 +41,7 @@ class TodoController {
       data: newTodo,
     });
   });
-  
+
   updateTodo = catchAsync(async (req: Request, res: Response) => {
     const data = await TodoService.updateTodo(req.body as any);
     res.status(httpStatus.OK).send({
@@ -74,7 +76,7 @@ class TodoController {
       });
       return;
     }
-    const data = await TodoService.updateAttachments({ id, files: uploadedFiles });
+    const data = await TodoService.updatedAttachments({ id, files: uploadedFiles });
     res.status(httpStatus.OK).send({
       message: 'Upload successfully!',
       data,
@@ -98,6 +100,44 @@ class TodoController {
     const data = await TodoService.deleteTodo(Number(req.params.id));
     res.status(httpStatus.OK).send({
       message: 'Delete todo successfully!',
+      data,
+    });
+  });
+
+  createTodoComment = catchAsync(async (req: Request, res: Response) => {
+    const { id } = pick(req.params, ['id']);
+    const data = await TodoCommentService.create(Number(id), req.body);
+    res.status(httpStatus.CREATED).send({
+      message: 'Create todo comment successfully!',
+      data,
+    });
+  });
+
+  updateTodoComment = catchAsync(async (req: Request, res: Response) => {
+    const { id } = pick(req.params, ['id']);
+    const data = await TodoCommentService.update(id, req.body);
+    res.status(httpStatus.OK).send({
+      message: 'Update todo comment successfully!',
+      data,
+    });
+  });
+
+  deleteTodoComment = catchAsync(async (req: Request, res: Response) => {
+    const { commentId } = pick(req.params, ['commentId']);
+    const token = req.headers.authorization?.split(' ')[1] as string;
+    const getInfoFromToken = Encrypt.getInfoFromToken(token) as { id: number };
+    const data = await TodoCommentService.delete(commentId, getInfoFromToken.id);
+    res.status(httpStatus.OK).send({
+      message: 'Delete todo comment successfully!',
+      data,
+    });
+  });
+
+  getLogsByTodoId = catchAsync(async (req: Request, res: Response) => {
+    const { id } = pick(req.params, ['id']);
+    const data = await TodoService.getLogsByTodoId(Number(id));
+    res.status(httpStatus.OK).send({
+      message: 'Get logs successfully!',
       data,
     });
   });

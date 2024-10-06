@@ -59,13 +59,14 @@ class ProjectService {
     const project = await this.repository.findOne({
       where: { id },
       relations: { todos: true },
-    })
+    });
     if (!project) {
       throw new ApiError(httpStatus.NOT_FOUND, 'Project not found');
     }
+    this.repository.delete(id);
     const { todos = [] } = project;
     todos.forEach((todo: Todo) => {
-      this.userRepository.delete(todo.id);
+      this.todoRepository.delete(todo.id);
     });
     return project;
   }

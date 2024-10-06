@@ -12,6 +12,7 @@ import { Priority, TodoStatus } from '@/types/todo';
 import { Attachment } from '@/entity/attachment.entity';
 import { Project } from '@/entity/project.entity';
 import { TodoStatusLog } from './todo_status_log';
+import { TodoComment } from './todo_comment.entity';
 
 @Entity()
 export class Todo {
@@ -43,10 +44,10 @@ export class Todo {
   assignee: string[];
 
   @CreateDateColumn({ type: 'timestamp'})
-  public createAt: Date;
+  public createdAt: Date;
 
   @UpdateDateColumn({ type: 'timestamp' })
-  public updateAt: Date;
+  public updatedAt: Date;
 
   @ManyToOne(() => Project, (project: any) => project.todos)
   project: string;
@@ -56,4 +57,7 @@ export class Todo {
 
   @OneToMany(() => TodoStatusLog, (statusLog: any) => statusLog.todo)
   statusLogs: TodoStatusLog[];
+
+  @OneToMany(() => TodoComment, (comment: any) => comment.todo)
+  comments: TodoComment[];
 }

@@ -35,9 +35,7 @@ class AuthMiddleWare {
   }
 
   private async setUp() {
-    console.log('setUp...');
     const URL = `https://cognito-idp.${this.poolRegion}.amazonaws.com/${this.userPoolId}/.well-known/jwks.json`;
-    // console.log(URL, 'URL');
     try {
       const response = await fetch(URL);
       if (response.status !== 200) {
