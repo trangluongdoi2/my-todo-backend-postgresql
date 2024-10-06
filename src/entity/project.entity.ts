@@ -23,10 +23,10 @@ export class Project {
   projectName: string;
 
   @CreateDateColumn({ type: 'timestamp'})
-  public createAt: Date;
+  public createdAt: Date;
 
   @UpdateDateColumn({ type: 'timestamp' })
-  public updateAt: Date;
+  public updatedAt: Date;
 
   @OneToMany(() => Todo, (todo: any) => todo.project)
   todos: Todo[]

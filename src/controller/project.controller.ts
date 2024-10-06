@@ -82,7 +82,6 @@ class ProjectController {
   });
 
   removeMember = catchAsync(async (req: Request, res: Response) => {
-    console.log('removeMember...');
     res.status(httpStatus.OK).send({
       message: 'Remove member successfully',
       data: [],

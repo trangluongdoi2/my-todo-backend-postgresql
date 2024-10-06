@@ -32,3 +32,11 @@ export type TAttachment = {
   id: string,
   filePath: string,
 }
+
+export type TCreateTodoLog = {
+  userId: number,
+  oldValue: string,
+  newValue: string,
+  field: keyof TodoItem | 'comment',
+  action: 'create' | 'update' | 'delete',
+}

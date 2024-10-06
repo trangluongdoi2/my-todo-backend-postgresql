@@ -31,16 +31,23 @@ class TodoService {
   async getTodoById(id: number) {
     const todo = await this.repository.createQueryBuilder('todo')
     .leftJoinAndSelect('todo.statusLogs', 'statusLogs')
-    .leftJoinAndSelect('statusLogs.user', 'user')
+    .orderBy('statusLogs.createdAt', 'DESC')
+    .leftJoinAndSelect('statusLogs.user', 'user1')
     .leftJoinAndSelect('todo.attachments', 'attachments')
+    .leftJoinAndSelect('todo.comments', 'comments')
+    .leftJoinAndSelect('comments.user', 'user2')
     .where('todo.id = :id', { id })
     .select([
       'todo',
       'statusLogs',
       'attachments',
-      'user.id',
-      'user.username',
-      'user.email',
+      'comments',
+      'user1.id',
+      'user1.username',
+      'user1.email',
+      'user2.id',
+      'user2.username',
+      'user2.email',
     ])
     .getOne();
     return todo;
@@ -75,7 +82,7 @@ class TodoService {
     return todos;
   }
 
-  private async createTodoLog(input: any) {
+  async createTodoLog(input: any) {
     const { userId } = input;
     const user = await this.userRepository.findOneBy({ id: userId });
     const newTodoStatusLog = new TodoStatusLog();
@@ -153,7 +160,7 @@ class TodoService {
     return updatedTodo;
   }
 
-  async updateAttachments(input: { id: number, files: any[] }) {
+  async updatedAttachments(input: { id: number, files: any[] }) {
     const todoItem = await this.repository.findOne({
       where: { id: input.id },
       relations: { attachments: true }
@@ -185,6 +192,16 @@ class TodoService {
     });
     const deleteTodo = await this.repository.delete(id);
     return deleteTodo;
+  }
+
+  async getLogsByTodoId(todoId: number) {
+    const logs = await this.todoStatusLogRepository.createQueryBuilder('todoStatusLog')
+      .leftJoin('todoStatusLog.user', 'user')
+      .where('todoStatusLog.todoId = :id', { id: todoId })
+      .orderBy('todoStatusLog.createdAt', 'DESC')
+      .addSelect(['user.id', 'user.username', 'user.email'])
+      .getMany();
+    return logs;
   }
 }
 
