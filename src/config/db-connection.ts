@@ -3,7 +3,7 @@ import { Project } from "@/entity/project.entity";
 import { Todo } from "@/entity/todo.entity";
 import { User } from "@/entity/user.entity";
 import { Attachment } from "@/entity/attachment.entity";
-import { TodoStatusLog } from "@/entity/todo_status_log";
+import { TodoStatusLog } from "@/entity/todo_status_log.entity";
 import config from "./index";
 
 export const AppDataSource = new DataSource({

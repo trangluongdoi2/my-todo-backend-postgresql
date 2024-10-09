@@ -7,7 +7,7 @@ import ApiError from '@/utils/apiError';
 import { Project } from '@/entity/project.entity';
 import { Todo } from '@/entity/todo.entity';
 import { Attachment } from '@/entity/attachment.entity';
-import { TodoStatusLog } from '@/entity/todo_status_log';
+import { TodoStatusLog } from '@/entity/todo_status_log.entity';
 import { User } from '@/entity/user.entity';
 
 class TodoService {
