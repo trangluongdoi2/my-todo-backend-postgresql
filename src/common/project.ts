@@ -1,5 +1,5 @@
 import { User } from "@/common/user";
-import { TodoItem } from "./type";
+import { TodoItem } from "@/types/todo";
 
 export interface ProjectItem {
   projectName: string,
