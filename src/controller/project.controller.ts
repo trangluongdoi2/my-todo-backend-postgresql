@@ -7,7 +7,10 @@ import { pick } from '@/utils/pick';
 class ProjectController {
   getProjects = catchAsync(async (req: Request, res: Response) => {
     const projects = await ProjectService.getProjects();
-    res.status(httpStatus.OK).send(projects);
+    res.status(httpStatus.OK).send({
+      message: 'Get projects successfully',
+      data: projects
+    });
   });
 
   getProjectById = catchAsync(async (req: Request, res: Response) => {

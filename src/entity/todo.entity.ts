@@ -11,7 +11,7 @@ import {
 import { Priority, TodoStatus } from '@/types/todo';
 import { Attachment } from '@/entity/attachment.entity';
 import { Project } from '@/entity/project.entity';
-import { TodoStatusLog } from './todo_status_log';
+import { TodoStatusLog } from './todo_status_log.entity';
 import { TodoComment } from './todo_comment.entity';
 
 @Entity()
