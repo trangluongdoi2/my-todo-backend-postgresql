@@ -5,13 +5,13 @@ import httpStatus from 'http-status';
 import { Repository } from 'typeorm';
 import { ProjectItem } from '@/common/project';
 import { AppDataSource } from '@/config/db-connection';
+import config from '@/config';
+import ApiError from '@/utils/apiError';
 import { Project } from '@/entity/project.entity';
 import { Todo } from '@/entity/todo.entity';
 import { User } from '@/entity/user.entity';
 import MailService from './mail.service';
-import ApiError from '@/utils/apiError';
-import config from '@/config';
-
+import TodoService from './todo.service';
 class ProjectService {
   private repository: Repository<Project>;
   private userRepository: Repository<User>;
@@ -65,9 +65,9 @@ class ProjectService {
     }
     this.repository.delete(id);
     const { todos = [] } = project;
-    todos.forEach((todo: Todo) => {
-      this.todoRepository.delete(todo.id);
-    });
+    Promise.all(todos.map((todo: Todo) => {
+      TodoService.deleteTodo(todo.id);
+    }));
     return project;
   }
 

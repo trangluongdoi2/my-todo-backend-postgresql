@@ -9,12 +9,14 @@ import { Todo } from '@/entity/todo.entity';
 import { Attachment } from '@/entity/attachment.entity';
 import { TodoStatusLog } from '@/entity/todo_status_log.entity';
 import { User } from '@/entity/user.entity';
+import { TodoComment } from '@/entity/todo_comment.entity';
 
 class TodoService {
   private repository: Repository<Todo>;
   private projectRepository: Repository<Project>;
   private attachmentRepository: Repository<Attachment>;
   private todoStatusLogRepository: Repository<TodoStatusLog>;
+  private todoCommentRepository: Repository<TodoComment>;
   private userRepository: Repository<User>;
   constructor() {
     this.repository = AppDataSource.getRepository(Todo);
@@ -22,6 +24,7 @@ class TodoService {
     this.attachmentRepository = AppDataSource.getRepository(Attachment);
     this.todoStatusLogRepository = AppDataSource.getRepository(TodoStatusLog);
     this.userRepository = AppDataSource.getRepository(User);
+    this.todoCommentRepository = AppDataSource.getRepository(TodoComment);
   }
   async getTodos() {
     const todos = await this.repository.find();
@@ -178,17 +181,20 @@ class TodoService {
   async deleteTodo(id: number) {
     const todo = await this.repository.findOne({
       where: { id },
-      relations: { statusLogs: true, attachments: true },
+      relations: { statusLogs: true, attachments: true, comments: true },
     })
     if (!todo) {
       throw new ApiError(httpStatus.NOT_FOUND, 'Todo not found');
     }
-    const { statusLogs = [], attachments = [] } = todo;
+    const { statusLogs = [], attachments = [], comments = [] } = todo;
     statusLogs.forEach((statusLog: TodoStatusLog) => {
       this.todoStatusLogRepository.delete(statusLog.id);
     });
     attachments.forEach((attachment: Attachment) => {
       this.attachmentRepository.delete(attachment.id);
+    });
+    comments.forEach((comment: TodoComment) => {
+      this.todoCommentRepository.delete(comment.id);
     });
     const deleteTodo = await this.repository.delete(id);
     return deleteTodo;
