@@ -163,7 +163,7 @@ class TodoService {
     return updatedTodo;
   }
 
-  async updatedAttachments(input: { id: number, files: any[] }) {
+  async updateAttachments(input: { id: number, files: any[] }) {
     const todoItem = await this.repository.findOne({
       where: { id: input.id },
       relations: { attachments: true }

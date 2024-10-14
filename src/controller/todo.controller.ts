@@ -67,16 +67,54 @@ class TodoController {
     });
   });
 
-  uploadImages = catchAsync(async (req: Request, res: Response) => {
-    const id = req.body.id || '';
-    const uploadedFiles = await UploadS3Service.handle((req?.files as any) || []);
-    if (!uploadedFiles.length) {
+  uploadAttachmentByVideos = catchAsync(async (req: Request, res: Response) => {
+    const { id, projectId } = pick(req.body, ['id', 'projectId']);
+    const uploadedFiles = await UploadS3Service.handleUploadVideo(projectId, (req?.files as any) || []);
+    if (!uploadedFiles?.length) {
       res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
         message: 'Upload failed!',
       });
       return;
     }
-    const data = await TodoService.updatedAttachments({ id, files: uploadedFiles });
+    const data = await TodoService.updateAttachments({ id, files: uploadedFiles });
+    res.status(httpStatus.OK).send({
+      message: 'Upload successfully!',
+      data,
+    });
+  });
+
+  uploadAttachments = catchAsync(async (req: Request, res: Response) => {
+    const { id, projectId } = pick(req.body, ['id', 'projectId']);
+    const uploadedFiles = req.files as any;
+    const { videos = [], images = [] } = uploadedFiles;
+    // console.log(videos, images, '=>> uploadedFiles');
+    console.log(images, '=>> uploadedFiles');
+    const uploadedVideos = await UploadS3Service.handleUploadVideo(projectId, videos);
+    const uploadedImages = await UploadS3Service.handleUploadImage(projectId, images);
+    if (!uploadedVideos?.length && !uploadedImages?.length) {
+      res.status(httpStatus.EXPECTATION_FAILED).send({
+        message: 'Upload failed!',
+      });
+      return;
+    }
+    const data = await TodoService.updateAttachments({ id, files: [...uploadedVideos || [], ...uploadedImages || []] });
+    // const data = await TodoService.updateAttachments({ id, files: [...uploadedVideos || []] });
+    res.status(httpStatus.OK).send({
+      message: 'Upload successfully!',
+      data,
+    });
+  });
+
+  uploadAttachmentByImages = catchAsync(async (req: Request, res: Response) => {
+    const { id, projectId } = pick(req.body, ['id', 'projectId']);
+    const uploadedFiles = await UploadS3Service.handleUploadImage(projectId, (req?.files as any) || []);
+    if (!uploadedFiles?.length) {
+      res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
+        message: 'Upload failed!',
+      });
+      return;
+    }
+    const data = await TodoService.updateAttachments({ id, files: uploadedFiles });
     res.status(httpStatus.OK).send({
       message: 'Upload successfully!',
       data,
