@@ -25,10 +25,15 @@ class UploadS3Service {
     this.bucket = config.aws.bucket;
   }
 
-  async getObject(key: string) {
+  private getKeyUploadByProjectId(projectId: number, fileName: string) {
+    return `uploads/${projectId}/${fileName}`;
+  }
+
+  async getObject({ key, projectId }: any) {
+    const keyQuery = this.getKeyUploadByProjectId(projectId, key);
     const command = new GetObjectCommand({
       Bucket: this.bucket,
-      Key: key,
+      Key: keyQuery,
     });
     try {
       const res = await this.client.send(command);
@@ -39,10 +44,6 @@ class UploadS3Service {
       console.error(err);
       return undefined;
     }
-  }
-
-  private getKeyUploadByProjectId(projectId: number, fileName: string) {
-    return `uploads/${projectId}/${fileName}`;
   }
 
   private getKeyUploadByUserId(userId: number, fileName: string) {
@@ -116,26 +117,24 @@ class UploadS3Service {
   }
 
   async uploadS3MultiPart(projectId: number, uploadParams: any, files: any) {
-    const promises = [];
-    const firstFile = files[0];
-    console.log(firstFile, '==> uploadS3MultiPart...');
+    const result: Array<Record<string, any> | undefined> = [];
+    const promises: Promise<any>[] = [];
     try {
-      const key = this.getKeyUploadByProjectId(projectId, files.originalname);
-      const upload = new Upload({
-        client: this.client,
-        params: {
-          Bucket: this.bucket,
-          Key: key,
-          ContentType: uploadParams.ContentType,
-          Body: firstFile.buffer,
-        },
-      });
-      upload.on('httpUploadProgress', (progress) => {
-        console.log(progress, '==> progress...');
-      });
-      const res = await upload.done();
-      return [];
-      // await upload.done();
+      files.map((file: any) => {
+        const key = this.getKeyUploadByProjectId(projectId, file.originalname);
+        const upload = new Upload({
+          client: this.client,
+          params: {
+            Bucket: this.bucket,
+            Key: key,
+            ContentType: uploadParams.ContentType,
+            Body: file.buffer,
+          },
+        });
+        // upload.on('httpUploadProgress', (progress) => {
+        // });
+        promises.push(upload.done());
+      })
     } catch (error) {
       if (error instanceof Error && error.name === "AbortError") {
         console.error(`Multipart upload was aborted. ${error.message}`);
@@ -143,6 +142,15 @@ class UploadS3Service {
         throw error;
       }
     }
+    const res = await Promise.all(promises);
+    res.map((item: any) => {
+      result.push({
+        filePath: item.Location,
+        fileName: item.originalname || '',
+        name: getFileNameWithoutExtension(item.Key),
+      })
+    });
+    return result;
   }
 
   async uploadS3MultiPart2(projectId: number, uploadParams: any, files: any) {
@@ -216,7 +224,6 @@ class UploadS3Service {
         Bucket: this.bucket,
       }
       return await this.uploadS3(projectId, uploadParams, files);
-      // return await this.uploadS3Test(projectId, uploadParams);
     } catch (error) {
       return [];
     }
@@ -230,9 +237,7 @@ class UploadS3Service {
       ContentType: 'video/*',
       Bucket: this.bucket,
     }
-    // return await this.uploadS3(projectId, uploadParams, files);
     return await this.uploadS3MultiPart(projectId, uploadParams, files);
-    // return await this.uploadS3MultiPart(projectId, uploadParams, files);
   }
 }
 

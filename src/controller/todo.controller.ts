@@ -87,18 +87,16 @@ class TodoController {
     const { id, projectId } = pick(req.body, ['id', 'projectId']);
     const uploadedFiles = req.files as any;
     const { videos = [], images = [] } = uploadedFiles;
-    // console.log(videos, images, '=>> uploadedFiles');
-    console.log(images, '=>> uploadedFiles');
     const uploadedVideos = await UploadS3Service.handleUploadVideo(projectId, videos);
     const uploadedImages = await UploadS3Service.handleUploadImage(projectId, images);
+    console.log(uploadedVideos, uploadedImages, '==> uploadedVideos, uploadedImages...');
     if (!uploadedVideos?.length && !uploadedImages?.length) {
       res.status(httpStatus.EXPECTATION_FAILED).send({
         message: 'Upload failed!',
       });
       return;
     }
-    const data = await TodoService.updateAttachments({ id, files: [...uploadedVideos || [], ...uploadedImages || []] });
-    // const data = await TodoService.updateAttachments({ id, files: [...uploadedVideos || []] });
+    const data = await TodoService.updateAttachments({ id, files: [...uploadedVideos, ...uploadedImages] });
     res.status(httpStatus.OK).send({
       message: 'Upload successfully!',
       data,
@@ -122,8 +120,9 @@ class TodoController {
   });
 
   downloadImage = catchAsync(async (req: Request, res: Response) => {
-    const key = req.params.key || '';
-    const data = await UploadS3Service.getObject(key);
+    const { key = '' } = pick(req.params, ['key']);
+    const { projectId } = pick(req.query, ['projectId']);
+    const data = await UploadS3Service.getObject({ key, projectId });
     if (!data) {
       res.status(httpStatus.INTERNAL_SERVER_ERROR).send('Download Failed!');
     } else {

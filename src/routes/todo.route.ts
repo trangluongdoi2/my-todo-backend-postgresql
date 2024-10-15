@@ -6,9 +6,12 @@ import { pick } from "@/utils/pick";
 import { getExtensionFile } from "@/common/file";
 
 const cbFileFilter = (req: Request, file: Express.Multer.File, cb: any) => {
-  const newFileName = pick(req.body, ['newFileName']);
-  const extension = getExtensionFile(file.originalname);
-  file.originalname = (newFileName || Math.random().toString(36).substring(2, 15)) + extension;
+  const { fileNamesMap = {} } = pick(req.body, ['fileNamesMap']);
+  const fileNamesMapObj = JSON.parse(fileNamesMap);
+  const newFileName = fileNamesMapObj[file.originalname];
+  if (newFileName) {
+    file.originalname = newFileName
+  }
   cb(null, true);
 };
 
