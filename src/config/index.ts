@@ -26,6 +26,7 @@ const config = {
     secret_key: process.env.AWS_ACCESS_SECRET_KEY || '',
     cognito_app_client_id: process.env.COGNITO_APP_CLIENT_ID || '',
     cognito_user_pool_id: process.env.COGNITO_USER_POOL_ID || '',
-  }
-}
+    cdn_url: process.env.CDN_URL || '',
+  },
+};
 export default config;

@@ -51,8 +51,7 @@ class UploadS3Service {
   }
 
   private getObjectUrl(key: string) {
-    const region = config.aws.region;
-    const url = `https://${this.bucket}.s3.${region}.amazonaws.com/${key}`;
+    const url = `${config.aws.cdn_url}/${key}`;
     return url;
   }
 
