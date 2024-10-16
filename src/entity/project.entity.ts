@@ -16,9 +16,6 @@ export class Project {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column('text', { nullable: true })
-  projectId: string;
-
   @Column()
   projectName: string;
 

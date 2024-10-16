@@ -63,12 +63,24 @@ class ProjectService {
     if (!project) {
       throw new ApiError(httpStatus.NOT_FOUND, 'Project not found');
     }
-    this.repository.delete(id);
     const { todos = [] } = project;
-    Promise.all(todos.map((todo: Todo) => {
+    await Promise.all(todos.map((todo: Todo) => {
       TodoService.deleteTodo(todo.id);
     }));
+    project.todos = [];
+    await this.repository.save(project);
+    await this.repository.delete(id);
     return project;
+    // const project = await this.repository.createQueryBuilder('project')
+    //   .leftJoinAndSelect('project.todos', 'todo')
+    //   .leftJoinAndSelect('todo.statusLogs', 'statusLog')
+    //   .leftJoinAndSelect('todo.attachments', 'attachment')
+    //   .leftJoinAndSelect('todo.comments', 'comment')
+    //   .where('project.id = todo.projectId')
+    //   .delete()
+    //   .execute();
+    // console.log(project, '==> project...');
+    // return project;
   }
 
   async getProjectsByUserId(userId: number) {

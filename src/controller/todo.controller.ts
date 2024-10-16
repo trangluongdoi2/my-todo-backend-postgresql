@@ -89,7 +89,6 @@ class TodoController {
     const { videos = [], images = [] } = uploadedFiles;
     const uploadedVideos = await UploadS3Service.handleUploadVideo(projectId, videos);
     const uploadedImages = await UploadS3Service.handleUploadImage(projectId, images);
-    console.log(uploadedVideos, uploadedImages, '==> uploadedVideos, uploadedImages...');
     if (!uploadedVideos?.length && !uploadedImages?.length) {
       res.status(httpStatus.EXPECTATION_FAILED).send({
         message: 'Upload failed!',

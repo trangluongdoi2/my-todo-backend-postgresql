@@ -19,9 +19,6 @@ export class Todo {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column('text', { nullable: true })
-  todoId: string;
-
   @Column()
   todoName: string;
 

@@ -181,23 +181,27 @@ class TodoService {
   async deleteTodo(id: number) {
     const todo = await this.repository.findOne({
       where: { id },
-      relations: { statusLogs: true, attachments: true, comments: true },
-    })
+      relations: { 
+        statusLogs: true, 
+        attachments: true, 
+        comments: true,
+      },
+    });
     if (!todo) {
       throw new ApiError(httpStatus.NOT_FOUND, 'Todo not found');
     }
     const { statusLogs = [], attachments = [], comments = [] } = todo;
-    statusLogs.forEach((statusLog: TodoStatusLog) => {
+    await Promise.all(statusLogs.map((statusLog: TodoStatusLog) => {
       this.todoStatusLogRepository.delete(statusLog.id);
-    });
-    attachments.forEach((attachment: Attachment) => {
+    }));
+    await Promise.all(attachments.map((attachment: Attachment) => {
       this.attachmentRepository.delete(attachment.id);
-    });
-    comments.forEach((comment: TodoComment) => {
+    }));
+    await Promise.all(comments.map((comment: TodoComment) => {
       this.todoCommentRepository.delete(comment.id);
-    });
-    const deleteTodo = await this.repository.delete(id);
-    return deleteTodo;
+    }));
+    await this.repository.delete(id);
+    return todo;
   }
 
   async getLogsByTodoId(todoId: number) {
