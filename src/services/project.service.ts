@@ -12,14 +12,18 @@ import { Todo } from '@/entity/todo.entity';
 import { User } from '@/entity/user.entity';
 import MailService from './mail.service';
 import TodoService from './todo.service';
+import { SearchService, TypeIndex } from './search.service';
+
 class ProjectService {
   private repository: Repository<Project>;
   private userRepository: Repository<User>;
   private todoRepository: Repository<Todo>;
+  private searchService: SearchService;
   constructor() {
     this.repository = AppDataSource.getRepository(Project);
     this.userRepository = AppDataSource.getRepository(User);
     this.todoRepository = AppDataSource.getRepository(Todo);
+    this.searchService = new SearchService().getInstance();
   }
 
   async createProject(input: ProjectItem) {
@@ -37,6 +41,10 @@ class ProjectService {
       throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Create project failed!');
     }
     const res = await this.repository.save({ ...input });
+    this.searchService.saveDocument(TypeIndex.PROJECT, {
+      ...res,
+      _id: res.id,
+    })
     user.projects = [...user.projects || [], res];
     await this.userRepository.save(user);
     return res;
@@ -68,6 +76,8 @@ class ProjectService {
       TodoService.deleteTodo(todo.id);
     }));
     project.todos = [];
+
+    // TODO: need to refactor this case!
     await this.repository.save(project);
     await this.repository.delete(id);
     return project;

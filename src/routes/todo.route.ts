@@ -1,9 +1,8 @@
 import { Router } from "express";
 import multer from "multer";
+import { pick } from "@/utils/pick";
 import { todoController } from "@/controller/todo.controller";
 import AuthMiddleWare from "@/middleware/auth.middleware";
-import { pick } from "@/utils/pick";
-import { getExtensionFile } from "@/common/file";
 
 const cbFileFilter = (req: Request, file: Express.Multer.File, cb: any) => {
   const { fileNamesMap = {} } = pick(req.body, ['fileNamesMap']);

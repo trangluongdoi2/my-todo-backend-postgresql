@@ -6,6 +6,7 @@ import todoRoute from '@/routes/todo.route';
 import userRoute from '@/routes/user.route';
 import addMemberRoute from '@/routes/confirmAddMember.route';
 import projectRoute from '@/routes/project.route';
+import searchRoute from '@/routes/search.route';
 import { AppDataSource } from '@/config/db-connection';
 import swaggerPlugin from '@/config/swagger';
 import config from './config';
@@ -30,10 +31,12 @@ function initApp() {
       app.use('/api', todoRoute);
       app.use('/api', projectRoute);
       app.use('/api', addMemberRoute);
+      app.use('/api', searchRoute);
       app.get('/', (_, res: Response) => {
         res.send('<h1>My Todo App!!</h1>');
       });
       swaggerPlugin(app);
+      console.log(config.app_port, 'App port');
       app.listen(config.app_port, () => {
         const url = `http://localhost:${config.app_port}`;
         console.log(`App is running on ${url}`);

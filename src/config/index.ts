@@ -16,7 +16,7 @@ const config = {
     key: process.env.JWT_SECRET,
   },
   email_tranposter: {
-    email: process.env.EMAIL_USERNAME,
+    email: process.env.EMAIL_username,
     pass: process.env.EMAIL_PASSWORD,
   },
   aws: {
@@ -27,6 +27,13 @@ const config = {
     cognito_app_client_id: process.env.COGNITO_APP_CLIENT_ID || '',
     cognito_user_pool_id: process.env.COGNITO_USER_POOL_ID || '',
     cdn_url: process.env.CDN_URL || '',
+  },
+  elasticSearch: {
+    url: process.env.ELASTIC_SEARCH_URL || '',
+    cloudId: process.env.ELASTIC_SEARCH_CLOUND_ID || '',
+    apiKey: process.env.ELASTIC_SEARCH_CLOUND_API_KEY || '',
+    username: process.env.ELASTIC_SEARCH_username || '',
+    password: process.env.ELASTIC_SEARCH_PASSWORD || '',
   },
 };
 export default config;

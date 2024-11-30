@@ -13,7 +13,8 @@ export type FieldTodoItem = keyof TodoItem | 'comment';
 
 @Entity()
 export class TodoStatusLog {
-  @PrimaryGeneratedColumn('uuid')
+  // @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn()
   id: string;
 
   @Column()

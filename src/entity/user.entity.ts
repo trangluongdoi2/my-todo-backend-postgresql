@@ -22,6 +22,4 @@ export class User {
 
   @ManyToMany(() => Project, (project: any) => project.members)
   projects: Project[]
-  // @OneToMany(() => Todo, (todo: any) => todo.owner)
-  // todos: Todo[]
 }

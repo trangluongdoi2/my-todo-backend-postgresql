@@ -43,7 +43,7 @@ class AuthServices {
       AuthFlow: AuthFlowType.USER_PASSWORD_AUTH,
       ClientId: config.aws.cognito_app_client_id,
       AuthParameters: {
-        USERNAME: input.username,
+        username: input.username,
         PASSWORD: input.password,
       },
     };
@@ -79,7 +79,7 @@ class AuthServices {
   async signUp(input: InputRegister) {
     const params = {
       ClientId: config.aws.cognito_app_client_id,
-      Username: input.username,
+      username: input.username,
       Password: input.password,
       UserAttributes: [
         {
@@ -107,7 +107,7 @@ class AuthServices {
   async confirmSignUp(input: InputRegisterConfirmation) {
     const params = {
       ClientId: config.aws.cognito_app_client_id,
-      Username: input.username,
+      username: input.username,
       ConfirmationCode: input.code.toString(),
     };
     try {
@@ -132,7 +132,7 @@ class AuthServices {
       UserPoolId: config.aws.cognito_user_pool_id,
       ClientId: config.aws.cognito_app_client_id,
       AuthParameters: {
-        USERNAME: input.username,
+        username: input.username,
         REFRESH_TOKEN: input.token,
       },
     }
@@ -168,7 +168,7 @@ class AuthServices {
   async deleteUser(username: string) {
     // const command = new AdminDeleteUserCommand({
     //   UserPoolId: process.env.COGNITO_USER_POOL_ID as string,
-    //   Username: username,
+    //   username: username,
     // });
     // try {
     //   await this.cognitoClient.send(command);

@@ -10,6 +10,7 @@ import { Attachment } from '@/entity/attachment.entity';
 import { TodoStatusLog } from '@/entity/todo_status_log.entity';
 import { User } from '@/entity/user.entity';
 import { TodoComment } from '@/entity/todo_comment.entity';
+import { SearchService, TypeIndex } from './search.service';
 
 class TodoService {
   private repository: Repository<Todo>;
@@ -18,6 +19,7 @@ class TodoService {
   private todoStatusLogRepository: Repository<TodoStatusLog>;
   private todoCommentRepository: Repository<TodoComment>;
   private userRepository: Repository<User>;
+  private searchService: SearchService;
   constructor() {
     this.repository = AppDataSource.getRepository(Todo);
     this.projectRepository = AppDataSource.getRepository(Project);
@@ -25,6 +27,7 @@ class TodoService {
     this.todoStatusLogRepository = AppDataSource.getRepository(TodoStatusLog);
     this.userRepository = AppDataSource.getRepository(User);
     this.todoCommentRepository = AppDataSource.getRepository(TodoComment);
+    this.searchService = new SearchService().getInstance();
   }
   async getTodos() {
     const todos = await this.repository.find();
@@ -63,7 +66,7 @@ class TodoService {
     })
     const { statusLogs = [] } = todo as any;
     const newStatusLogs = await Promise.all(statusLogs.map(async (statusLog: any) => {
-      const res = await this.todoStatusLogRepository.createQueryBuilder('todoStatusLog')
+      const res = this.todoStatusLogRepository.createQueryBuilder('todoStatusLog')
         .leftJoin('todoStatusLog.user', 'user')
         .where('todoStatusLog.id = :id', { id: statusLog.id })
         .addSelect(['user.id', 'user.username', 'user.email'])
@@ -112,6 +115,10 @@ class TodoService {
       statusLogs: [savedTodoStatusLog],
     }
     const createdTodo = await this.repository.save(newTodo);
+    this.searchService.saveDocument(TypeIndex.TODO, {
+      ...createdTodo,
+      _id: createdTodo.todoId,
+    });
     const project = await this.projectRepository.findOne({
       where: {
         id: input.projectId,
@@ -131,6 +138,10 @@ class TodoService {
     const { id } = input;
     const todoNeedUpdate = await this.repository.findOneBy({ id: id as any });
     const updatedTodo = await this.repository.save(todoNeedUpdate as any);
+    this.searchService.updateDocument(TypeIndex.TODO, {
+      ...updatedTodo,
+      _id: updatedTodo.id,
+    });
     return updatedTodo;
   }
 
@@ -201,6 +212,7 @@ class TodoService {
       this.todoCommentRepository.delete(comment.id);
     }));
     await this.repository.delete(id);
+    this.searchService.deleteDocumentById(TypeIndex.TODO, id);
     return todo;
   }
 

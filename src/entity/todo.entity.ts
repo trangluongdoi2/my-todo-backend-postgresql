@@ -19,7 +19,7 @@ export class Todo {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column('text', { nullable: true })
   todoName: string;
 
   @Column()
