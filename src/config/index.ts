@@ -2,6 +2,8 @@ import dotenv from 'dotenv';
 import path from 'path';
 
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
+
+// console.log(process.env, '===> process.env');
 const config = {
   app_port: process.env.PORT || 9998,
   host: process.env.NODE_ENV === 'production' ? 'https://server.trangluongdoi2.com' : `http://localhost:${process.env.PORT}`,
@@ -30,10 +32,10 @@ const config = {
   },
   elasticSearch: {
     url: process.env.ELASTIC_SEARCH_URL || '',
-    cloudId: process.env.ELASTIC_SEARCH_CLOUND_ID || '',
-    apiKey: process.env.ELASTIC_SEARCH_CLOUND_API_KEY || '',
-    username: process.env.ELASTIC_SEARCH_username || '',
-    password: process.env.ELASTIC_SEARCH_PASSWORD || '',
+    cloudId: process.env.ES_CLOUD_ID || '',
+    apiKey: process.env.ES_CLOUD_API_KEY || '',
+    username: process.env.ES_USERNAME || '',
+    password: process.env.ES_SEARCH_PASSWORD || '',
   },
 };
 export default config;
