@@ -28,7 +28,7 @@ export class Project {
   @OneToMany(() => Todo, (todo: any) => todo.project)
   todos: Todo[]
 
-  @ManyToMany(() => User, (user: any) => user.projects)
+  @ManyToMany(() => User, (user: any) => user.projects, { nullable: true })
   @JoinTable()
   members: User[]
 }

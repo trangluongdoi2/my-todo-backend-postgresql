@@ -89,7 +89,7 @@ class AuthServices {
       ],
     };
     try {
-      const command = new SignUpCommand(params);
+      const command = new SignUpCommand(params as any);
       await this.cognitoClient.send(command);
       return {
         status: 200,
@@ -111,7 +111,7 @@ class AuthServices {
       ConfirmationCode: input.code.toString(),
     };
     try {
-      const command = new ConfirmSignUpCommand(params);
+      const command = new ConfirmSignUpCommand(params as any);
       await this.cognitoClient.send(command);
       return {
         status: 200,

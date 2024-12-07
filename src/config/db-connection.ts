@@ -16,9 +16,9 @@ export const AppDataSource = new DataSource({
   database: config.postgresql.database,
   synchronize: true,
   entities: [
+    User,
     Project,
     Todo,
-    User,
     Attachment,
     TodoStatusLog,
     TodoComment,

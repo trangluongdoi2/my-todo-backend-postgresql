@@ -10,6 +10,7 @@ import searchRoute from '@/routes/search.route';
 import { AppDataSource } from '@/config/db-connection';
 import swaggerPlugin from '@/config/swagger';
 import config from './config';
+import logger from './config/logger';
 
 function initApp() {
   try {
@@ -41,6 +42,7 @@ function initApp() {
         const url = `http://localhost:${config.app_port}`;
         console.log(`App is running on ${url}`);
         console.log(`Swagger is running on ${url}/api-docs`);
+        logger.info(`App is running on ${url}`);
       });
     }) 
   } catch (error) {
