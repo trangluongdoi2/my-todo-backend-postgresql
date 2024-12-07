@@ -1,7 +1,6 @@
 import { RoleUser } from '@/common/user';
 import { Project } from '@/entity/project.entity';
-import { Column, Entity, ManyToMany, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { Todo } from './todo.entity';
+import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class User {
@@ -20,7 +19,7 @@ export class User {
   @Column({ default: RoleUser.ADMIN, nullable: true })
   role: RoleUser
 
-  @ManyToMany(() => Project, (project: any) => project.members)
+  @ManyToMany(() => Project, (project: any) => project.members, { nullable: true })
   projects: Project[]
   // @OneToMany(() => Todo, (todo: any) => todo.owner)
   // todos: Todo[]
