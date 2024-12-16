@@ -2,7 +2,6 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -31,10 +30,10 @@ export class Todo {
   @Column()
   description: string;
 
-  @Column()
+  @Column({ default: Priority.MEDIUM })
   priority: Priority;
 
-  @Column()
+  @Column({ default: TodoStatus.PENDING })
   todoStatus: TodoStatus;
 
   @Column('text', { array: true, nullable: true })
@@ -46,15 +45,15 @@ export class Todo {
   @UpdateDateColumn({ type: 'timestamp' })
   public updatedAt: Date;
 
-  @ManyToOne(() => Project, (project: any) => project.todos)
-  project: string;
+  @ManyToOne(() => Project, (project: Project) => project.todos)
+  project: Project;
 
-  @OneToMany(() => Attachment, (attachment: any) => attachment.todo)
-  attachments: any;
+  @OneToMany(() => Attachment, (attachment: Attachment) => attachment.todo)
+  attachments: Attachment[];
 
-  @OneToMany(() => TodoStatusLog, (statusLog: any) => statusLog.todo)
+  @OneToMany(() => TodoStatusLog, (statusLog: TodoStatusLog) => statusLog.todo, { cascade: true })
   statusLogs: TodoStatusLog[];
 
-  @OneToMany(() => TodoComment, (comment: any) => comment.todo)
+  @OneToMany(() => TodoComment, (comment: TodoComment) => comment.todo)
   comments: TodoComment[];
 }

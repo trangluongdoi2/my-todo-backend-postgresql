@@ -12,6 +12,6 @@ export class Attachment {
   @Column('text', { nullable: true })
   fileName: string;
 
-  @ManyToOne(() => Todo, (todo: any) => todo.attachments)
-  todo: string;
+  @ManyToOne(() => Todo, (todo: Todo) => todo.attachments)
+  todo: Todo;
 }

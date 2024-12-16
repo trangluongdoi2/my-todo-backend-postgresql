@@ -9,7 +9,7 @@ import { Todo } from './todo.entity';
 import { TodoItem } from '@/types/todo';
 import { User } from './user.entity';
 
-export type FieldTodoItem = keyof TodoItem | 'comment';
+export type FieldTodoItem = keyof TodoItem | 'comment' | '';
 
 @Entity()
 export class TodoStatusLog {
@@ -31,9 +31,9 @@ export class TodoStatusLog {
   @CreateDateColumn({ type: 'timestamp' })
   public createdAt: Date;
 
-  @ManyToOne(() => Todo, (todo: any) => todo.statusLogs)
+  @ManyToOne(() => Todo, (todo: Todo) => todo.statusLogs)
   todo: Todo;
 
-  @ManyToOne(() => User, (user) => user)
+  @ManyToOne(() => User, (user: User) => user)
   user: User;
 }

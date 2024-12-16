@@ -1,5 +1,3 @@
-import { Todo } from '@/entity/todo.entity';
-import { User } from '@/entity/user.entity';
 import {
   Column,
   CreateDateColumn,
@@ -10,6 +8,8 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Todo } from '@/entity/todo.entity';
+import { User } from '@/entity/user.entity';
 
 @Entity()
 export class Project {
@@ -25,10 +25,10 @@ export class Project {
   @UpdateDateColumn({ type: 'timestamp' })
   public updatedAt: Date;
 
-  @OneToMany(() => Todo, (todo: any) => todo.project)
-  todos: Todo[]
+  @OneToMany(() => Todo, (todo: Todo) => todo.project, { cascade: true })
+  todos: Todo[];
 
-  @ManyToMany(() => User, (user: any) => user.projects, { nullable: true })
+  @ManyToMany(() => User, (user: User) => user.projects, { nullable: true })
   @JoinTable()
-  members: User[]
+  members: User[];
 }

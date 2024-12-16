@@ -17,10 +17,8 @@ export class User {
   password: string;
 
   @Column({ default: RoleUser.ADMIN, nullable: true })
-  role: RoleUser
+  role: RoleUser;
 
-  @ManyToMany(() => Project, (project: any) => project.members, { nullable: true })
-  projects: Project[]
-  // @OneToMany(() => Todo, (todo: any) => todo.owner)
-  // todos: Todo[]
+  @ManyToMany(() => Project, (project: Project) => project.members, { nullable: true })
+  projects: Project[];
 }

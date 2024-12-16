@@ -94,8 +94,9 @@ class TodoService {
     newTodoStatusLog.newValue = input.newValue;
     newTodoStatusLog.action = input.action;
     newTodoStatusLog.user = user as User;
-    const savedTodoStatusLog = await this.todoStatusLogRepository.save(newTodoStatusLog);
-    return savedTodoStatusLog;
+    // const savedTodoStatusLog = await this.todoStatusLogRepository.save(newTodoStatusLog);
+    // return savedTodoStatusLog;
+    return newTodoStatusLog;
   }
 
   async createTodo(userId: number, input: TodoItem) {

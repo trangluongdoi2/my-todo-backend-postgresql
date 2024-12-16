@@ -22,9 +22,9 @@ export class TodoComment {
   @CreateDateColumn({ type: 'timestamp' })
   public updatedAt: Date;
 
-  @ManyToOne(() => Todo, (todo: any) => todo.comments)
+  @ManyToOne(() => Todo, (todo: Todo) => todo.comments)
   todo: Todo;
 
-  @ManyToOne(() => User, (user) => user)
+  @ManyToOne(() => User, (user: User) => user)
   user: User;
 }
