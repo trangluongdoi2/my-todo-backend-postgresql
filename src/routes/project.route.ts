@@ -1,6 +1,6 @@
-import { Router } from "express";
+import { Router } from 'express';
 import ProjectController from '@/controller/project.controller';
-import AuthMiddleware from "@/middleware/auth.middleware";
+import AuthMiddleware from '@/middleware/auth.middleware';
 
 const router = Router();
 router.get('/projects', AuthMiddleware.authentication, ProjectController.getProjects);

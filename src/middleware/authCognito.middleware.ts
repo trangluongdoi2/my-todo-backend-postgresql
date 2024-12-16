@@ -1,8 +1,8 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction } from 'express';
 import jwkToPem from 'jwk-to-pem';
 import jwt from 'jsonwebtoken';
 
-let pems: { [key: string]: any } = {};
+const pems: { [key: string]: any } = {};
 
 class AuthMiddleWare {
   private poolRegion: string = 'ap-southeast-1';
@@ -16,22 +16,22 @@ class AuthMiddleWare {
     if (!token) {
       return res.status(401).json({ message: 'Unauthorized' });
     }
-    let decodedJwt: any = jwt.decode(token, { complete: true });
+    const decodedJwt: any = jwt.decode(token, { complete: true });
     if (decodedJwt === null) {
       return res.status(401).json({ message: 'Unauthorized' });
     }
-    let kid = decodedJwt.header.kid;
-    let pem = pems[kid];
+    const kid = decodedJwt.header.kid;
+    const pem = pems[kid];
     if (!pem) {
       res.status(401).json({ message: 'Unauthorized' });
-      return
+      return;
     }
     jwt.verify(token, pem, (err: any, payload: any) => {
       if (err) {
         return res.status(401).json({ message: 'Unauthorized' });
       }
       next();
-    })
+    });
   }
 
   private async setUp() {
@@ -53,10 +53,9 @@ class AuthMiddleWare {
         pems[key_id] = pem;
       }
     } catch (error) {
-      
+      console.log(error);
     }
   }
 }
 
 export const authMiddleWare = new AuthMiddleWare();
-

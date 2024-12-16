@@ -1,16 +1,15 @@
-import { Router } from "express";
-import multer from "multer";
-import { todoController } from "@/controller/todo.controller";
-import AuthMiddleWare from "@/middleware/auth.middleware";
-import { pick } from "@/utils/pick";
-import { getExtensionFile } from "@/common/file";
+import { Router } from 'express';
+import multer from 'multer';
+import { todoController } from '@/controller/todo.controller';
+import AuthMiddleWare from '@/middleware/auth.middleware';
+import { pick } from '@/utils/pick';
 
 const cbFileFilter = (req: Request, file: Express.Multer.File, cb: any) => {
   const { fileNamesMap = {} } = pick(req.body, ['fileNamesMap']);
   const fileNamesMapObj = JSON.parse(fileNamesMap);
   const newFileName = fileNamesMapObj[file.originalname];
   if (newFileName) {
-    file.originalname = newFileName
+    file.originalname = newFileName;
   }
   cb(null, true);
 };
@@ -32,7 +31,9 @@ router.post('/todo/add-comment/:id', AuthMiddleWare.authentication, todoControll
 router.put('/todo/update-comment/:commentId', AuthMiddleWare.authentication, todoController.updateTodoComment);
 router.delete('/todo/delete-comment/:commentId', AuthMiddleWare.authentication, todoController.deleteTodoComment);
 
-router.post('/todo/upload/:id', AuthMiddleWare.authentication,
+router.post(
+  '/todo/upload/:id',
+  AuthMiddleWare.authentication,
   uploadMiddleWare.fields([
     { name: 'images', maxCount: 10 },
     { name: 'videos', maxCount: 10 },

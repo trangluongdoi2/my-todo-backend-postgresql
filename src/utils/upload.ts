@@ -6,7 +6,7 @@ export function fileToBuffer(filePath: any) {
     const chunks: any[] = [];
 
     fileStream.on('data', (chunk) => {
-        chunks.push(chunk);
+      chunks.push(chunk);
     });
 
     fileStream.on('end', () => {
@@ -16,7 +16,7 @@ export function fileToBuffer(filePath: any) {
     });
 
     fileStream.on('error', (error) => {
-        reject(error);
+      reject(error);
     });
   });
 }

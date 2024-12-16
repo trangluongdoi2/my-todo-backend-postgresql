@@ -31,13 +31,13 @@ class ProjectService {
       },
       relations: {
         projects: true,
-      }
+      },
     });
     if (!user) {
       throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Create project failed!');
     }
     const res = await this.repository.save({ ...input });
-    user.projects = [...user.projects || [], res];
+    user.projects = [...(user.projects || []), res];
     await this.userRepository.save(user);
     return res;
   }
@@ -64,9 +64,11 @@ class ProjectService {
       throw new ApiError(httpStatus.NOT_FOUND, 'Project not found');
     }
     const { todos = [] } = project;
-    await Promise.all(todos.map((todo: Todo) => {
-      TodoService.deleteTodo(todo.id);
-    }));
+    await Promise.all(
+      todos.map((todo: Todo) => {
+        TodoService.deleteTodo(todo.id);
+      }),
+    );
     project.todos = [];
     await this.repository.save(project);
     await this.repository.delete(id);
@@ -102,9 +104,9 @@ class ProjectService {
     return members;
   }
 
-  async sentInviteMailToAddMember(input: { fromEmail: string, destEmail: string, projectId: number }) {
+  async sentInviteMailToAddMember(input: { fromEmail: string; destEmail: string; projectId: number }) {
     const { fromEmail = '', destEmail = '', projectId } = input;
-    const data = await this.getProjectById(projectId) as any;
+    const data = (await this.getProjectById(projectId)) as any;
     const user = await this.getMemberByEmail(destEmail);
     if (!user) {
       throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
@@ -121,8 +123,8 @@ class ProjectService {
       },
       memberInfos: {
         name: user?.username,
-      }
-    }
+      },
+    };
     const html = fnTemplate(info);
     const transporter = MailService.transporter;
     const mainOptions = {
@@ -148,7 +150,7 @@ class ProjectService {
       },
       relations: {
         projects: true,
-      }
+      },
     });
     return res;
   }
@@ -162,7 +164,7 @@ class ProjectService {
       },
       relations: {
         members: true,
-      }
+      },
     });
     if (!project || !user) {
       throw new ApiError(httpStatus.NOT_FOUND, 'Add member failed!');

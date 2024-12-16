@@ -1,7 +1,7 @@
 export enum TodoStatus {
-  PENDING = "PENDING",
-  IN_PROGRESS = "IN PROGRESS",
-  DONE = "DONE"
+  PENDING = 'PENDING',
+  IN_PROGRESS = 'IN PROGRESS',
+  DONE = 'DONE',
 }
 
 export enum Priority {
@@ -12,31 +12,31 @@ export enum Priority {
 }
 
 export interface TodoItem {
-  todoName: string,
-  todoId: string,
-  title: string,
-  todoStatus: TodoStatus,
-  projectId: number,
-  label: string,
-  description: string,
-  priority: Priority,
-  assignee?: string[],
+  todoName: string;
+  todoId: string;
+  title: string;
+  todoStatus: TodoStatus;
+  projectId: number;
+  label: string;
+  description: string;
+  priority: Priority;
+  assignee?: string[];
 }
 
 export interface TodoItemDetails extends TodoItem {
-  id: string,
-  attachments?: Array<{ id: string, filePath: string }>,
+  id: string;
+  attachments?: Array<{ id: string; filePath: string }>;
 }
 
 export type TAttachment = {
-  id: string,
-  filePath: string,
-}
+  id: string;
+  filePath: string;
+};
 
 export type TCreateTodoLog = {
-  userId: number,
-  oldValue: string,
-  newValue: string,
-  field: keyof TodoItem | 'comment',
-  action: 'create' | 'update' | 'delete',
-}
+  userId: number;
+  oldValue: string;
+  newValue: string;
+  field: keyof TodoItem | 'comment';
+  action: 'create' | 'update' | 'delete';
+};

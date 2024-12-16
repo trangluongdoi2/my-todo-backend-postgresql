@@ -1,9 +1,9 @@
-import { setSeederFactory } from "typeorm-extension";
-import { Todo } from "@/entity/todo.entity";
-import { TodoStatusLog } from "@/entity/todo_status_log.entity";
-import { TodoStatus } from "@/types/todo";
+import { setSeederFactory } from 'typeorm-extension';
+import { Todo } from '@/entity/todo.entity';
+import { TodoStatusLog } from '@/entity/todo_status_log.entity';
+import { TodoStatus } from '@/types/todo';
 
-export const TodoFactory = setSeederFactory(Todo, async () => {  
+export const TodoFactory = setSeederFactory(Todo, async () => {
   const todo = new Todo();
   const randomNumber = Number(Math.floor(Math.random() * 1000000).toString());
   const randomTitle = `Title-${randomNumber}`;

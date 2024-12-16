@@ -6,14 +6,13 @@ import { Request, Response } from 'express';
 import httpStatus from 'http-status';
 
 export class UserController {
-
   register = catchAsync(async (req: Request, res: Response) => {
     const { username, email, password } = pick(req.body, ['username', 'email', 'password']);
     const input: any = {
       username,
       email,
-      password
-    }
+      password,
+    };
     const newUser = await UserService.createUser(input);
     res.status(httpStatus.OK).send({
       message: 'Register successfully!',
@@ -25,7 +24,7 @@ export class UserController {
     const user = await UserService.login(req.body as UserLogin);
     res.status(httpStatus.OK).send({
       message: 'Login successfully',
-      data: user
+      data: user,
     });
   });
 
@@ -56,7 +55,7 @@ export class UserController {
     res.status(httpStatus.OK).send({
       message: 'Get refresh token successfully!',
       data,
-    })
+    });
   });
 }
 

@@ -8,7 +8,7 @@ class AuthController {
       username,
       password,
       email,
-    }
+    };
     const data = await AuthServices.signUp(inputRegister);
     res.status(data.status).send(data.message);
   }
@@ -22,7 +22,7 @@ class AuthController {
     const data = await AuthServices.signIn(req.body as any);
     res.status(data?.status).json({
       message: data?.message,
-      data: data?.data
+      data: data?.data,
     });
   }
 
@@ -30,19 +30,18 @@ class AuthController {
     const data = await AuthServices.refreshToken(req.body as any);
     res.status(data.status).json({
       message: data.message,
-      data: data.data
+      data: data.data,
     });
   }
 
   updateUser(req: Request, res: Response) {
-    res.send('updateUser...')
+    res.send('updateUser...');
   }
-  
+
   async deleteUser(req: Request, res: Response) {
     const data = await AuthServices.deleteUser(req.body.username as string);
     res.status(data.status).send(data.message);
   }
 }
 
-export const authController = new AuthController;
-
+export const authController = new AuthController();

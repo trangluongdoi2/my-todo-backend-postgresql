@@ -1,11 +1,11 @@
-import { Request, Response } from "express";
-import { pick } from "@/utils/pick";
-import TodoService from "@/services/todo.service";
+import { Request, Response } from 'express';
+import { pick } from '@/utils/pick';
+import TodoService from '@/services/todo.service';
 import UploadS3Service from '@/services/upload.service';
 import { catchAsync } from '@/utils/catchAsync';
 import Encrypt from '@/helpers/encrypt';
 import httpStatus from 'http-status';
-import TodoCommentService from "@/services/todo-comment.service";
+import TodoCommentService from '@/services/todo-comment.service';
 
 class TodoController {
   getTodos = catchAsync(async (req: Request, res: Response) => {
@@ -59,7 +59,7 @@ class TodoController {
       id,
       field,
       value,
-    }
+    };
     const data = await TodoService.updateTodoByField(getInfoFromToken.userId, input);
     res.status(httpStatus.OK).send({
       message: 'Update todo successfully!',

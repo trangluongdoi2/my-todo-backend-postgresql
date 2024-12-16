@@ -9,8 +9,6 @@ import {
 import { Upload } from '@aws-sdk/lib-storage';
 import config from '@/config';
 import { getFileNameWithoutExtension } from '@/common/file';
-import fs from "fs";
-import path from "path";
 
 class UploadS3Service {
   private client;
@@ -20,7 +18,7 @@ class UploadS3Service {
       credentials: {
         accessKeyId: config.aws.access_key,
         secretAccessKey: config.aws.secret_key,
-      }
+      },
     });
     this.bucket = config.aws.bucket;
   }
@@ -38,7 +36,7 @@ class UploadS3Service {
     try {
       const res = await this.client.send(command);
       // Need research why the base64 is allow create blob and 'uint-8' is not
-      const data =  await res.Body?.transformToString('base64');
+      const data = await res.Body?.transformToString('base64');
       return data;
     } catch (err) {
       console.error(err);
@@ -82,35 +80,38 @@ class UploadS3Service {
   async uploadS3(projectId: number, uploadParams: any, files: any) {
     const resultUrls: any[] = [];
     const result: Array<Record<string, any> | undefined> = [];
-    await Promise.allSettled(files.map((file: any) => {
-      const nameWithoutExtension = getFileNameWithoutExtension(file.originalname);
-      const metaData = {
-        name: nameWithoutExtension,
-      }
-      const key = this.getKeyUploadByProjectId(projectId, file.originalname);
-      const params = {
-        Bucket: uploadParams.Bucket,
-        Key: key,
-        ContentType: uploadParams.ContentType,
-        Body: file.buffer,
-        MetaData: metaData,
-      }
-      const url = this.getObjectUrl(key);
-      resultUrls.push(url);
-      result.push({
-        filePath: url,
-        fileName: file.originalname,
-        name: nameWithoutExtension,
-      })
-      const command = new PutObjectCommand(params);
-      return this.client.send(command);
-    })).then((data) => {
+    await Promise.allSettled(
+      files.map((file: any) => {
+        const nameWithoutExtension = getFileNameWithoutExtension(file.originalname);
+        const metaData = {
+          name: nameWithoutExtension,
+        };
+        const key = this.getKeyUploadByProjectId(projectId, file.originalname);
+        const params = {
+          Bucket: uploadParams.Bucket,
+          Key: key,
+          ContentType: uploadParams.ContentType,
+          Body: file.buffer,
+          MetaData: metaData,
+        };
+        const url = this.getObjectUrl(key);
+        resultUrls.push(url);
+        result.push({
+          filePath: url,
+          fileName: file.originalname,
+          name: nameWithoutExtension,
+        });
+        const command = new PutObjectCommand(params);
+        return this.client.send(command);
+      }),
+    ).then((data) => {
       data.forEach((res: any, index: number) => {
         if (res.status === 'fulfilled') {
+          console.log('fulfilled');
         } else {
           result[index] = undefined;
         }
-      })
+      });
     });
     return result;
   }
@@ -133,9 +134,9 @@ class UploadS3Service {
         // upload.on('httpUploadProgress', (progress) => {
         // });
         promises.push(upload.done());
-      })
+      });
     } catch (error) {
-      if (error instanceof Error && error.name === "AbortError") {
+      if (error instanceof Error && error.name === 'AbortError') {
         console.error(`Multipart upload was aborted. ${error.message}`);
       } else {
         throw error;
@@ -147,7 +148,7 @@ class UploadS3Service {
         filePath: item.Location,
         fileName: item.originalname || '',
         name: getFileNameWithoutExtension(item.Key),
-      })
+      });
     });
     return result;
   }
@@ -161,7 +162,7 @@ class UploadS3Service {
         new CreateMultipartUploadCommand({
           Bucket: this.bucket,
           Key: key,
-        })
+        }),
       );
       uploadId = multipartUpload.UploadId as string;
 
@@ -178,15 +179,17 @@ class UploadS3Service {
         const start = i * partSize;
         const end = Math.min(start + partSize, firstFile.Body.length);
         uploadPromises.push(
-          this.client.send(
-            new UploadPartCommand({
-              Bucket: this.bucket,
-              Key: key,
-              UploadId: uploadId,
-              Body: firstFile.Body.slice(start, end),
-              PartNumber: i + 1,
-            }))
-            .then((d) => d)
+          this.client
+            .send(
+              new UploadPartCommand({
+                Bucket: this.bucket,
+                Key: key,
+                UploadId: uploadId,
+                Body: firstFile.Body.slice(start, end),
+                PartNumber: i + 1,
+              }),
+            )
+            .then((d) => d),
         );
       }
       const uploadResults = await Promise.all(uploadPromises);
@@ -202,12 +205,11 @@ class UploadS3Service {
               PartNumber: i + 1,
             })),
           },
-        })
+        }),
       );
       console.log(completeUploading, '==> completeUploading...');
       // return [completeUploading];
       return [];
-
     } catch (error) {
       console.error(error, '==> error...');
     }
@@ -221,7 +223,7 @@ class UploadS3Service {
       const uploadParams = {
         ContentType: 'image/jpeg',
         Bucket: this.bucket,
-      }
+      };
       return await this.uploadS3(projectId, uploadParams, files);
     } catch (error) {
       return [];
@@ -235,7 +237,7 @@ class UploadS3Service {
     const uploadParams = {
       ContentType: 'video/*',
       Bucket: this.bucket,
-    }
+    };
     return await this.uploadS3MultiPart(projectId, uploadParams, files);
   }
 }

@@ -7,7 +7,7 @@ const swaggerPlugin = (app: Application) => {
   return {
     specs: swaggerJs,
     swaggerUi: swaggerUi,
-  }
-}
+  };
+};
 
 export default swaggerPlugin;

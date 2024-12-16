@@ -1,8 +1,8 @@
-import { DataSource } from "typeorm";
-import { Seeder, SeederFactoryManager } from "typeorm-extension";
-import { User } from "@/entity/user.entity";
-import { Project } from "@/entity/project.entity";
-import { Todo } from "@/entity/todo.entity";
+import { DataSource } from 'typeorm';
+import { Seeder, SeederFactoryManager } from 'typeorm-extension';
+import { User } from '@/entity/user.entity';
+import { Project } from '@/entity/project.entity';
+import { Todo } from '@/entity/todo.entity';
 
 export class MainSeeder implements Seeder {
   public async run(dataSource: DataSource, factoryManager: SeederFactoryManager): Promise<void> {

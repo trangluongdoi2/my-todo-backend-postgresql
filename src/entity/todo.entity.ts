@@ -39,7 +39,7 @@ export class Todo {
   @Column('text', { array: true, nullable: true })
   assignee: string[];
 
-  @CreateDateColumn({ type: 'timestamp'})
+  @CreateDateColumn({ type: 'timestamp' })
   public createdAt: Date;
 
   @UpdateDateColumn({ type: 'timestamp' })

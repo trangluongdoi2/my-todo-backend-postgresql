@@ -3,5 +3,5 @@ export function getFileNameWithoutExtension(fileName: string = '') {
   return nameWithoutExtension ?? '';
 }
 export function getExtensionFile(fileName: string = '') {
-  return (fileName.split('.').pop()) ?? '';
+  return fileName.split('.').pop() ?? '';
 }

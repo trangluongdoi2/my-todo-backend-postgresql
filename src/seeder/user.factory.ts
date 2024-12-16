@@ -1,6 +1,6 @@
-import { setSeederFactory } from "typeorm-extension";
+import { setSeederFactory } from 'typeorm-extension';
 import * as bcrypt from 'bcrypt';
-import { User } from "@/entity/user.entity";
+import { User } from '@/entity/user.entity';
 
 export const UserFactory = setSeederFactory(User, async () => {
   const user = new User();

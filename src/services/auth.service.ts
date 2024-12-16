@@ -1,33 +1,29 @@
 import dotenv from 'dotenv';
-import { 
+import {
   CognitoIdentityProviderClient,
   InitiateAuthCommand,
   SignUpCommand,
   ConfirmSignUpCommand,
   AuthFlowType,
-  DeleteUserPoolCommand,
-  AdminDeleteUserCommand,
-  DeleteUserCommand,
-} from "@aws-sdk/client-cognito-identity-provider";
+} from '@aws-sdk/client-cognito-identity-provider';
 import config from '@/config';
 
-
 type InputRegister = {
-  username: string,
-  password: string,
-  email: string,
-}
+  username: string;
+  password: string;
+  email: string;
+};
 
 type InputRegisterConfirmation = {
-  username: string,
-  code: string
-}
+  username: string;
+  code: string;
+};
 
 type InputLogin = {
-  username: string,
-  email?: string,
-  password: string
-}
+  username: string;
+  email?: string;
+  password: string;
+};
 
 dotenv.config();
 class AuthServices {
@@ -54,25 +50,25 @@ class AuthServices {
         const data = {
           idToken: AuthenticationResult.IdToken,
           accessToken: AuthenticationResult.AccessToken,
-          refreshToken: AuthenticationResult.RefreshToken
-        }
+          refreshToken: AuthenticationResult.RefreshToken,
+        };
         return {
           status: 200,
-          message: "User signed in successfully",
-          data
-        }
+          message: 'User signed in successfully',
+          data,
+        };
       }
       return {
         status: 500,
-        message: "Error signing in",
+        message: 'Error signing in',
         data: null,
-      }
+      };
     } catch (error) {
       return {
         status: 500,
-        message: "Error signing in",
+        message: 'Error signing in',
         data: null,
-      }
+      };
     }
   }
 
@@ -83,7 +79,7 @@ class AuthServices {
       Password: input.password,
       UserAttributes: [
         {
-          Name: "email",
+          Name: 'email',
           Value: input.email,
         },
       ],
@@ -93,16 +89,16 @@ class AuthServices {
       await this.cognitoClient.send(command);
       return {
         status: 200,
-        message: "User signed up successfully"
-      }
+        message: 'User signed up successfully',
+      };
     } catch (error) {
-      console.error("Error signing up: ", error);
+      console.error('Error signing up: ', error);
       return {
         status: 500,
-        message: "Error signing up"
-      }
+        message: 'Error signing up',
+      };
     }
-  };
+  }
 
   async confirmSignUp(input: InputRegisterConfirmation) {
     const params = {
@@ -115,14 +111,14 @@ class AuthServices {
       await this.cognitoClient.send(command);
       return {
         status: 200,
-        message: "User confirmed successfully"
-      }
+        message: 'User confirmed successfully',
+      };
     } catch (error) {
-      console.error("Error confirming sign up: ", error);
+      console.error('Error confirming sign up: ', error);
       return {
         status: 500,
-        message: "Error confirming sign up"
-      }
+        message: 'Error confirming sign up',
+      };
     }
   }
 
@@ -135,7 +131,7 @@ class AuthServices {
         USERNAME: input.username,
         REFRESH_TOKEN: input.token,
       },
-    }
+    };
 
     try {
       const command = new InitiateAuthCommand(params as any);
@@ -144,28 +140,29 @@ class AuthServices {
         const data = {
           accessToken: AuthenticationResult.AccessToken,
           refreshToken: AuthenticationResult.RefreshToken,
-          idToken: AuthenticationResult.IdToken
-        }
+          idToken: AuthenticationResult.IdToken,
+        };
         return {
           status: 200,
-          message: "Token refreshed successfully",
-          data
-        }
+          message: 'Token refreshed successfully',
+          data,
+        };
       }
       return {
         status: 500,
-        message: "Error refreshing token"
-      }
+        message: 'Error refreshing token',
+      };
     } catch (error) {
       console.error(error);
       return {
         status: 500,
-        message: "Error refreshing token"
-      }
+        message: 'Error refreshing token',
+      };
     }
   }
 
   async deleteUser(username: string) {
+    console.log(username, '==> username');
     // const command = new AdminDeleteUserCommand({
     //   UserPoolId: process.env.COGNITO_USER_POOL_ID as string,
     //   Username: username,
@@ -185,8 +182,8 @@ class AuthServices {
     // }
     return {
       status: 500,
-      message: "Error deleting user"
-    }
+      message: 'Error deleting user',
+    };
   }
 }
 

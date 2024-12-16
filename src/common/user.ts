@@ -1,19 +1,19 @@
 export interface User {
-  userId: string
+  userId: string;
   email: string;
   password: string;
 }
 
 export interface UserLogin {
-  username: string,
-  password: string,
+  username: string;
+  password: string;
 }
 
 export type UserCreate = {
-  username: string,
-  password: string,
-  email: string
-}
+  username: string;
+  password: string;
+  email: string;
+};
 
 export enum RoleUser {
   ADMIN = 'ADMIN',
@@ -22,5 +22,5 @@ export enum RoleUser {
 
 export enum ProjectRole {
   OWNER = 'OWNER',
-  DEVELOPER = 'DEVELOPER'
+  DEVELOPER = 'DEVELOPER',
 }

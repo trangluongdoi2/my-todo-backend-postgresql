@@ -9,7 +9,7 @@ class MailService {
       auth: {
         user: config.email_tranposter.email,
         pass: config.email_tranposter.pass,
-      }
+      },
     });
   }
   sendMail(fromEmail: string, destEmail: string) {

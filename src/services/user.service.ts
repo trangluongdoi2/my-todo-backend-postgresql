@@ -1,5 +1,5 @@
 import * as bcrypt from 'bcrypt';
-import { User } from '@/entity/user.entity'
+import { User } from '@/entity/user.entity';
 import { AppDataSource } from '@/config/db-connection';
 import { UserCreate, UserLogin } from '@/common/user';
 import { Repository } from 'typeorm';
@@ -15,9 +15,7 @@ class UserServices {
   }
 
   async getAllUser() {
-    const res = await this.entity.createQueryBuilder('User')
-      .select('User.username, User.email, User.role')
-      .execute();
+    const res = await this.entity.createQueryBuilder('User').select('User.username, User.email, User.role').execute();
     return res;
   }
 
@@ -36,7 +34,7 @@ class UserServices {
       ...res,
       accessToken,
       refreshToken,
-    }
+    };
   }
 
   async login(input: UserLogin) {
@@ -55,11 +53,13 @@ class UserServices {
     return {
       ...args,
       accessToken,
-      refreshToken
-    }
+      refreshToken,
+    };
   }
 
-  async logout(input: any) {}
+  async logout(input: any) {
+    console.log(input);
+  }
 
   async getRefreshToken(token: string) {
     const id = await AuthMiddleWare.verifyRefreshToken(token);
@@ -68,7 +68,7 @@ class UserServices {
     }
     return {
       accessToken: Encrypt.generateToken({ userId: id }),
-    }
+    };
   }
 
   async getUserById(id: number) {

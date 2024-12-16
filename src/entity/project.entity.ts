@@ -19,7 +19,7 @@ export class Project {
   @Column()
   projectName: string;
 
-  @CreateDateColumn({ type: 'timestamp'})
+  @CreateDateColumn({ type: 'timestamp' })
   public createdAt: Date;
 
   @UpdateDateColumn({ type: 'timestamp' })

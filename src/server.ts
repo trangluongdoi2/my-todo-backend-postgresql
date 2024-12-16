@@ -15,18 +15,20 @@ function initApp() {
   try {
     AppDataSource.initialize().then(() => {
       const app = express();
-      app.use(cors({
-        origin: '*',
-        methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-        credentials: true,
-        allowedHeaders: ['*'],
-      }));
+      app.use(
+        cors({
+          origin: '*',
+          methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+          credentials: true,
+          allowedHeaders: ['*']
+        })
+      );
       app.use(bodyParser.urlencoded({ extended: true }));
       app.use(bodyParser.json());
 
       app.set('views', path.join(__dirname, 'views'));
       app.set('view engine', 'jade');
-    
+
       app.use('/api', userRoute);
       app.use('/api', todoRoute);
       app.use('/api', projectRoute);
@@ -41,7 +43,7 @@ function initApp() {
         console.log(`Swagger is running on ${url}/api-docs`);
         logger.info(`App is running on ${url}`);
       });
-    }) 
+    });
   } catch (error) {
     console.log(`Database connection failed with error ${error}`);
   }

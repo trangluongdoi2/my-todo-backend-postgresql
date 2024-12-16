@@ -1,5 +1,5 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-import { Todo } from "@/entity/todo.entity";
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Todo } from '@/entity/todo.entity';
 
 @Entity()
 export class Attachment {

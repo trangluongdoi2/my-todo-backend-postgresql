@@ -9,7 +9,7 @@ class ProjectController {
     const projects = await ProjectService.getProjects();
     res.status(httpStatus.OK).send({
       message: 'Get projects successfully',
-      data: projects
+      data: projects,
     });
   });
 
@@ -18,7 +18,7 @@ class ProjectController {
     const project = await ProjectService.getProjectById(Number(id));
     res.status(httpStatus.OK).send({
       message: 'Get project successfully',
-      data: project
+      data: project,
     });
   });
 
@@ -27,16 +27,16 @@ class ProjectController {
     const projects = await ProjectService.getProjectsByUserId(Number(userId));
     res.status(httpStatus.OK).send({
       message: 'Get project successfully',
-      data: projects
+      data: projects,
     });
   });
 
   createProject = catchAsync(async (req: Request, res: Response) => {
-    const input: ProjectItem = { ...req.body }
+    const input: ProjectItem = { ...req.body };
     const newProject = await ProjectService.createProject(input);
     res.status(httpStatus.OK).send({
       message: 'Create project successfully',
-      data: newProject
+      data: newProject,
     });
   });
 
@@ -52,7 +52,7 @@ class ProjectController {
     const deletedProject = await ProjectService.deleteProjectById(Number(id));
     res.status(httpStatus.OK).send({
       message: 'Delete project successfully',
-      data: deletedProject
+      data: deletedProject,
     });
   });
 
@@ -80,7 +80,7 @@ class ProjectController {
     const newProject = await ProjectService.addMember({ email, projectId });
     res.status(httpStatus.OK).send({
       message: 'Add member successfully',
-      data: newProject
+      data: newProject,
     });
   });
 
