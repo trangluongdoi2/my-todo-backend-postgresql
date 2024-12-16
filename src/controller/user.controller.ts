@@ -41,22 +41,23 @@ export class UserController {
     console.log('logout...');
   }
 
-  async getUserById(req: Request, res: Response) {
+  getUserById = catchAsync(async (req: Request, res: Response) => {
     const { id } = req.params;
     const result = await UserService.getUserById(Number(id));
     res.status(httpStatus.OK).send({
       message: 'Get user successfully!',
       data: result,
     });
-  }
+  });
 
-  async getRefreshToken(req: Request, res: Response) {
+  getRefreshToken = catchAsync(async (req: Request, res: Response) => {
     const { refreshToken = '' } = req.body;
     const data = await UserService.getRefreshToken(refreshToken);
-    res.json({
+    res.status(httpStatus.OK).send({
+      message: 'Get refresh token successfully!',
       data,
     })
-  }
+  });
 }
 
 export default new UserController();

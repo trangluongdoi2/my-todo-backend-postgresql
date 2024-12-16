@@ -5,7 +5,6 @@ import httpStatus from "http-status";
 export const catchAsync = (fn: Function) => (req: Request, res: Response, next: NextFunction) => {
   Promise.resolve(fn(req, res, next))
     .then((data) => {
-      console.log(data, 'data');
       logger.info(data);
     })
     .catch((err) => {

@@ -43,10 +43,8 @@ class ProjectService {
   }
 
   async getProjects() {
-    // console.error('===< getProjects');
-    throw new Error();
-    // const projects = await this.repository.find();
-    // return projects;
+    const projects = await this.repository.find();
+    return projects;
   }
 
   async getProjectById(id: number) {
@@ -86,14 +84,13 @@ class ProjectService {
   }
 
   async getProjectsByUserId(userId: number) {
-    // const project = await this.repository
-    //   .createQueryBuilder('project')
-    //   .leftJoinAndSelect('project.members', 'member')
-    //   .where('member.id = :userId', { userId })
-    //   .leftJoinAndSelect('project.todos', 'todo')
-    //   .getMany();
-    // return project;
-    throw new Error('what the hell');
+    const project = await this.repository
+      .createQueryBuilder('project')
+      .leftJoinAndSelect('project.members', 'member')
+      .where('member.id = :userId', { userId })
+      .leftJoinAndSelect('project.todos', 'todo')
+      .getMany();
+    return project;
   }
 
   async getMembersById(id: number) {

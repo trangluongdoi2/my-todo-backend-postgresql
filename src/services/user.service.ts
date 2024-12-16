@@ -64,16 +64,11 @@ class UserServices {
   async getRefreshToken(token: string) {
     const id = await AuthMiddleWare.verifyRefreshToken(token);
     if (!id) {
-      return {
-        status: 401,
-        message: 'Invalid token!',
-      }
+      throw new ApiError(httpStatus.UNAUTHORIZED, 'Invalid refresh token!');
     }
-    const newToken = Encrypt.generateToken({ id });
     return {
-      status: 200,
-      accessToken: newToken,
-    };
+      accessToken: Encrypt.generateToken({ userId: id }),
+    }
   }
 
   async getUserById(id: number) {
